@@ -1,18 +1,17 @@
-﻿
-// Dependencies
+﻿'use strict';
 var http = require('http');
 var request = require('request');
 var express = require('express');
 
-var app = express();
-const redirect_uri = '<YOUR-CALLBACK-URL>';
+var router = express.Router();
+const redirect_uri = 'https://www.wetradehq.com/leaderboards';
 
 /* 
 Callback endpoint the TDA app uses.
 To understand more about how the API authenticates, see this link.
 https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
-app.get('/auth', (req, res) => {
+router.get('/auth', function (req, res, next) {
     var authRequest = {
         url: 'https://api.tdameritrade.com/v1/oauth2/token',
         method: 'POST',
@@ -39,10 +38,4 @@ app.get('/auth', (req, res) => {
     });
 });
 
-// start server
-var httpServer = http.createServer(app);
-var port = process.env.PORT || 8080;
-httpServer.listen(port, () => {
-    console.log(`Listening at ${port}`);
-});
-view rawtd - auth.js hosted with ❤ by GitHub
+module.exports = router;
