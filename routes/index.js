@@ -5,10 +5,87 @@ var express = require('express');
 const puppeteer = require('puppeteer');
 var router = express.Router();
 const redirect_uri = 'https://discordbottrades.herokuapp.com/auth';
+const mainChannelID = 'MAIN DISCORD SERVER ID';
 const detailsFileName = '../details.json';
+const Discord = require('discord.js');
+const client = new Discord.Client();
+//Login Discord Bot
+client.login('NzI5MDQ2NzY4NDk0MzEzNTky.XwDQDg.2I0-KDMzd2blq9On4PQM_Fcz8D0');
+
+//On Discord Error
+client.on('error', err => {
+    utils.log.error(err);
+});
+exports.client = client;
+//Kick cancelled students
+client.on('ready', () => {
+    exports.client = client;
+});
 var details = require(detailsFileName);
+require('dotenv').config()
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
+var testPosition = [
+    //OrderGet:
+    {
+        "session": "'NORMAL' or 'AM' or 'PM' or 'SEAMLESS'",
+        "duration": "'DAY' or 'GOOD_TILL_CANCEL' or 'FILL_OR_KILL'",
+        "orderType": "'MARKET' or 'LIMIT' or 'STOP' or 'STOP_LIMIT' or 'TRAILING_STOP' or 'MARKET_ON_CLOSE' or 'EXERCISE' or 'TRAILING_STOP_LIMIT' or 'NET_DEBIT' or 'NET_CREDIT' or 'NET_ZERO'",
+        "cancelTime": {
+            "date": "string",
+            "shortFormat": false
+        },
+        "complexOrderStrategyType": "'NONE' or 'COVERED' or 'VERTICAL' or 'BACK_RATIO' or 'CALENDAR' or 'DIAGONAL' or 'STRADDLE' or 'STRANGLE' or 'COLLAR_SYNTHETIC' or 'BUTTERFLY' or 'CONDOR' or 'IRON_CONDOR' or 'VERTICAL_ROLL' or 'COLLAR_WITH_STOCK' or 'DOUBLE_DIAGONAL' or 'UNBALANCED_BUTTERFLY' or 'UNBALANCED_CONDOR' or 'UNBALANCED_IRON_CONDOR' or 'UNBALANCED_VERTICAL_ROLL' or 'CUSTOM'",
+        "quantity": 0,
+        "filledQuantity": 0,
+        "remainingQuantity": 0,
+        "requestedDestination": "'INET' or 'ECN_ARCA' or 'CBOE' or 'AMEX' or 'PHLX' or 'ISE' or 'BOX' or 'NYSE' or 'NASDAQ' or 'BATS' or 'C2' or 'AUTO'",
+        "destinationLinkName": "string",
+        "releaseTime": "string",
+        "stopPrice": 0,
+        "stopPriceLinkBasis": "'MANUAL' or 'BASE' or 'TRIGGER' or 'LAST' or 'BID' or 'ASK' or 'ASK_BID' or 'MARK' or 'AVERAGE'",
+        "stopPriceLinkType": "'VALUE' or 'PERCENT' or 'TICK'",
+        "stopPriceOffset": 0,
+        "stopType": "'STANDARD' or 'BID' or 'ASK' or 'LAST' or 'MARK'",
+        "priceLinkBasis": "'MANUAL' or 'BASE' or 'TRIGGER' or 'LAST' or 'BID' or 'ASK' or 'ASK_BID' or 'MARK' or 'AVERAGE'",
+        "priceLinkType": "'VALUE' or 'PERCENT' or 'TICK'",
+        "price": 0,
+        "taxLotMethod": "'FIFO' or 'LIFO' or 'HIGH_COST' or 'LOW_COST' or 'AVERAGE_COST' or 'SPECIFIC_LOT'",
+        "orderLegCollection": [
+            {
+                "orderLegType": "'EQUITY' or 'OPTION' or 'INDEX' or 'MUTUAL_FUND' or 'CASH_EQUIVALENT' or 'FIXED_INCOME' or 'CURRENCY'",
+                "legId": 0,
+                "instrument": "The type <Instrument> has the following subclasses [Equity, FixedIncome, MutualFund, CashEquivalent, Option] descriptions are listed below\"",
+                "instruction": "'BUY' or 'SELL' or 'BUY_TO_COVER' or 'SELL_SHORT' or 'BUY_TO_OPEN' or 'BUY_TO_CLOSE' or 'SELL_TO_OPEN' or 'SELL_TO_CLOSE' or 'EXCHANGE'",
+                "positionEffect": "'OPENING' or 'CLOSING' or 'AUTOMATIC'",
+                "quantity": 0,
+                "quantityType": "'ALL_SHARES' or 'DOLLARS' or 'SHARES'"
+            }
+        ],
+        "activationPrice": 0,
+        "specialInstruction": "'ALL_OR_NONE' or 'DO_NOT_REDUCE' or 'ALL_OR_NONE_DO_NOT_REDUCE'",
+        "orderStrategyType": "'SINGLE' or 'OCO' or 'TRIGGER'",
+        "orderId": 0,
+        "cancelable": false,
+        "editable": false,
+        "status": "'AWAITING_PARENT_ORDER' or 'AWAITING_CONDITION' or 'AWAITING_MANUAL_REVIEW' or 'ACCEPTED' or 'AWAITING_UR_OUT' or 'PENDING_ACTIVATION' or 'QUEUED' or 'WORKING' or 'REJECTED' or 'PENDING_CANCEL' or 'CANCELED' or 'PENDING_REPLACE' or 'REPLACED' or 'FILLED' or 'EXPIRED'",
+        "enteredTime": "string",
+        "closeTime": "string",
+        "tag": "string",
+        "accountId": 0,
+        "orderActivityCollection": [
+            "The type <OrderActivity> has the following subclasses [Execution] descriptions are listed below"
+        ],
+        "replacingOrderCollection": [
+            {}
+        ],
+        "childOrderStrategies": [
+            {}
+        ],
+        "statusDescription": "string"
+    }
+]
+
 /* 
 Callback endpoint the TDA app uses.
 To understand more about how the API authenticates, see this link.
@@ -35,25 +112,62 @@ router.get('/auth', function (req, res, next) {
         if (!error && response.statusCode == 200) {
             // parse the tokens
             var authReply = JSON.parse(body);
-            // to check it's correct, display it
             res.send(authReply);
         }
     });
 });
 
-router.get('/auth', async function (req, res, next) {
+
+router.get('/', function (req, res) {
+    validateTokens();
+    res.render('index');
+});
+
+router.get('/reset', async function (req, res, next) {
     try {
-        var result = await resetTokens;
+        var result = await resetTokens();
     } catch (err) {
         console.log(err);
     }
 });
 
+var lastOrderId = 0;
+//Get open positions
+function getOrderUpdates() {
+    var refresh_token_req = {
+        url: 'https://api.tdameritrade.com/v1/orders',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer ' + details.access_token
+        }
+    };
+    //Make the request and get positions
+    request(refresh_token_req, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            try {
+                console.log(body);
+                if (lastOrderId == 0 || lastOrderId != testPosition.orderId) {
+                    var messageToDisplay = testPosition.orderType + " order filled with a quantity of : " + testPosition.orderType + " at price : " + testPosition.price + " for symbol : " + testPosition.orderLegCollection[0].instrument.symbol;
+                    client.channels.get(mainChannelID).send(messageToDisplay);
+                    lastOrderId = testPosition.orderId;
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            console.log(error);
+            console.log(response);
+        }
+    });
+}
+setInterval(getOrderUpdates, 120000);
+
 /*
 Automatically fill in the login form to authenticate the TDA app
 */
 async function resetTokens() {
-
+    console.log('here');
     // Launch the browser
     const browser = await puppeteer.launch({
         args: ['--no-sandbox']
@@ -65,15 +179,15 @@ async function resetTokens() {
 
     // Enter username
     await page.click('#username');
-    await page.keyboard.type(process.env.USERNAME); // your trading account username
+    await page.keyboard.type(process.env.USER); // your trading account username
 
     // Enter password
     await page.click('#password');
-    await page.keyboard.type(process.env.PASSWORD); // your trading account password
-
+    await page.keyboard.type(process.env.PASS); // your trading account password
+    await page.click('#rememberuserid');
     // Click login button
     await page.click('#accept');
-
+    console.log('here');
     // Click allow button
     await page.click('#accept');
 
