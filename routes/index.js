@@ -9,12 +9,13 @@ const mainChannelID = 'MAIN DISCORD SERVER ID';
 const detailsFileName = '../details.json';
 const Discord = require('discord.js');
 const client = new Discord.Client();
+require('dotenv').config()
 //Login Discord Bot
-client.login('NzI5MDQ2NzY4NDk0MzEzNTky.XwDQDg.2I0-KDMzd2blq9On4PQM_Fcz8D0');
+client.login(process.env.DISCORDTOKEN);
 
 //On Discord Error
 client.on('error', err => {
-    utils.log.error(err);
+    console.log(err);
 });
 exports.client = client;
 //Kick cancelled students
@@ -22,7 +23,6 @@ client.on('ready', () => {
     exports.client = client;
 });
 var details = require(detailsFileName);
-require('dotenv').config()
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
 var testPosition = [
