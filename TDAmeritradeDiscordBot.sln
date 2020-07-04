@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.960
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "TDAmeritradeDiscordBot", "TDAmeritradeDiscordBot.njsproj", "{1D020B6F-99B4-4436-9390-DBFBEF6E4481}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D020B6F-99B4-4436-9390-DBFBEF6E4481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D020B6F-99B4-4436-9390-DBFBEF6E4481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D020B6F-99B4-4436-9390-DBFBEF6E4481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D020B6F-99B4-4436-9390-DBFBEF6E4481}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {608983EF-2785-4006-9892-9C715E15AF99}
+	EndGlobalSection
+EndGlobal
