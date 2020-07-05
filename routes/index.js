@@ -92,33 +92,45 @@ To understand more about how the API authenticates, see this link.
 https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
 router.get('/auth', function (req, res, next) {
-    var authRequest = {
-        url: 'https://api.tdameritrade.com/v1/oauth2/token',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        form: {
-            'grant_type': 'authorization_code',
-            'access_type': 'offline',
-            'code': req.query.code, // get the code from url
-            'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
-            'redirect_uri': redirect_uri
-        }
-    };
+    try {
+        var authRequest = {
+            url: 'https://api.tdameritrade.com/v1/oauth2/token',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            form: {
+                'grant_type': 'authorization_code',
+                'access_type': 'offline',
+                'code': decodeURIComponent(req.query.code), // get the code from url
+                'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
+                'redirect_uri': redirect_uri
+            }
+        };
 
-    // make the post request
-    request(authRequest, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            // parse the tokens
-            var authReply = JSON.parse(body);
-            console.log("Authorized!");
-            res.send(authReply);
-        } else {
-            console.log(error);
-            console.log(body);
-        }
-    });
+        // make the post request
+        request(authRequest, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                // parse the tokens
+                var authReply = JSON.parse(body);
+                console.log("Authorized!");
+                // parse the response to a new object
+                console.log(authReply);
+
+                // update the details file object
+                details.access_token = authReply.access_token;
+                details.refresh_token = authReply.refresh_token;
+                res.send(authReply);
+            } else {
+                console.log(error);
+                console.log(body);
+                res.send(body);
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.send(err);
+    }
 });
 
 
