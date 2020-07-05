@@ -103,7 +103,7 @@ router.get('/auth', function (req, res, next) {
                 'grant_type': 'authorization_code',
                 'access_type': 'offline',
                 'code': decodeURIComponent(req.query.code), // get the code from url
-                'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
+                'client_id': process.env.CLIENT_ID + "%40AMER.OAUTHAP", // this client id comes from config vars
                 'redirect_uri': redirect_uri
             }
         };
