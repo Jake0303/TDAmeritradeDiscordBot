@@ -93,6 +93,7 @@ https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
 router.get('/auth', function (req, res, next) {
     try {
+        console.log(req.query);
         var authRequest = {
             url: 'https://api.tdameritrade.com/v1/oauth2/token',
             method: 'POST',
@@ -102,7 +103,7 @@ router.get('/auth', function (req, res, next) {
             form: {
                 'grant_type': 'authorization_code',
                 'access_type': 'offline',
-                'code': decodeURIComponent(req.query.code), // get the code from url
+                'code': req.query.code, // get the code from url
                 'client_id': process.env.CLIENT_ID + "%40AMER.OAUTHAP", // this client id comes from config vars
                 'redirect_uri': redirect_uri
             }
