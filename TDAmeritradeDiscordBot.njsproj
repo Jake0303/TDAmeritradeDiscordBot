@@ -33,6 +33,7 @@
     <Compile Include="app.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\users.js" />
+    <Content Include=".env" />
     <Content Include="details.json">
       <SubType>Code</SubType>
     </Content>

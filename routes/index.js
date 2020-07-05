@@ -112,7 +112,11 @@ router.get('/auth', function (req, res, next) {
         if (!error && response.statusCode == 200) {
             // parse the tokens
             var authReply = JSON.parse(body);
+            console.log("Authorized!");
             res.send(authReply);
+        } else {
+            console.log(error);
+            console.log(body);
         }
     });
 });
