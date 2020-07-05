@@ -4,7 +4,7 @@ var request = require('request');
 var express = require('express');
 const puppeteer = require('puppeteer');
 var router = express.Router();
-const redirect_uri = 'https://discordbottrades.herokuapp.com/auth';
+const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com/auth');
 const mainChannelID = 'MAIN DISCORD SERVER ID';
 const detailsFileName = '../details.json';
 const Discord = require('discord.js');
@@ -93,7 +93,9 @@ https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
 router.get('/auth', function (req, res, next) {
     try {
-        console.log(req.query);
+        console.log(req.query.code);
+        console.log(process.env.CLIENT_ID + "%40AMER.OAUTHAP");
+        console.log(redirect_uri);
         var authRequest = {
             url: 'https://api.tdameritrade.com/v1/oauth2/token',
             method: 'POST',
