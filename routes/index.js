@@ -105,7 +105,7 @@ router.get('/auth', function (req, res, next) {
                 'access_type': 'offline',
                 'code': req.query.code, // get the code from url
                 'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
-                'redirect_uri': 'https://discordbottrades.herokuapp.com'
+                'redirect_uri': 'https://discordbottrades.herokuapp.com/auth'
             }
         };
 
@@ -123,7 +123,6 @@ router.get('/auth', function (req, res, next) {
                 details.refresh_token = authReply.refresh_token;
                 res.send(authReply);
             } else {
-                console.log(error);
                 console.log(body);
                 res.send(body);
             }
