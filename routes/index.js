@@ -93,9 +93,7 @@ https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
 router.get('/auth', function (req, res, next) {
     try {
-        console.log(req.query.code);
-        console.log(process.env.CLIENT_ID + "%40AMER.OAUTHAP");
-        console.log(redirect_uri);
+        console.log(process.env.CLIENT_ID + "@AMER.OAUTHAP");
         var authRequest = {
             url: 'https://api.tdameritrade.com/v1/oauth2/token',
             method: 'POST',
@@ -106,8 +104,8 @@ router.get('/auth', function (req, res, next) {
                 'grant_type': 'authorization_code',
                 'access_type': 'offline',
                 'code': req.query.code, // get the code from url
-                'client_id': process.env.CLIENT_ID + "%40AMER.OAUTHAP", // this client id comes from config vars
-                'redirect_uri': redirect_uri
+                'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
+                'redirect_uri': 'https://discordbottrades.herokuapp.com'
             }
         };
 
