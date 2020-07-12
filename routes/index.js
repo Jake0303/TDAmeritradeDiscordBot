@@ -23,6 +23,8 @@ client.on('ready', () => {
     exports.client = client;
 });
 var details = require(detailsFileName);
+details.access_token = "Test Access";
+details.refresh_token = "Test Refresh";
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
 var testPosition = [
@@ -114,14 +116,14 @@ router.get('/auth', function (req, res, next) {
             if (!error && response.statusCode == 200) {
                 // parse the tokens
                 var authReply = JSON.parse(body);
-                console.log("Authorized!");
                 // parse the response to a new object
                 console.log(authReply);
 
                 // update the details file object
                 details.access_token = authReply.access_token;
                 details.refresh_token = authReply.refresh_token;
-                res.send(authReply);
+                console.log(details);
+                res.send({"success":"Authorized!"});
             } else {
                 console.log(body);
                 res.send(body);
@@ -135,8 +137,34 @@ router.get('/auth', function (req, res, next) {
 
 
 router.get('/', function (req, res) {
-    validateTokens();
-    res.render('index');
+    console.log(details);
+    var refresh_token_req = {
+        url: 'https://api.tdameritrade.com/v1/orders',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer ' + details.access_token
+        }
+    };
+    //Make the request and get positions
+    request(refresh_token_req, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            try {
+                console.log(body);
+                res.send(body);
+                if (lastOrderId == 0 || lastOrderId != testPosition.orderId) {
+                    var messageToDisplay = testPosition.orderType + " order filled with a quantity of : " + testPosition.orderType + " at price : " + testPosition.price + " for symbol : " + testPosition.orderLegCollection[0].instrument.symbol;
+                    client.channels.get(mainChannelID).send(messageToDisplay);
+                    lastOrderId = testPosition.orderId;
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            console.log(error);
+            console.log(response);
+        }
+    });
 });
 
 router.get('/reset', async function (req, res, next) {
@@ -150,6 +178,7 @@ router.get('/reset', async function (req, res, next) {
 var lastOrderId = 0;
 //Get open positions
 function getOrderUpdates() {
+    console.log(details);
     var refresh_token_req = {
         url: 'https://api.tdameritrade.com/v1/orders',
         method: 'POST',
@@ -177,6 +206,8 @@ function getOrderUpdates() {
         }
     });
 }
+
+
 setInterval(getOrderUpdates, 120000);
 
 /*
