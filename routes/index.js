@@ -151,6 +151,7 @@ router.get('/', function (req, res) {
         if (!error && response.statusCode == 200) {
             try {
                 console.log(body);
+                console.log(details);
                 res.send(body);
                 if (lastOrderId == 0 || lastOrderId != testPosition.orderId) {
                     var messageToDisplay = testPosition.orderType + " order filled with a quantity of : " + testPosition.orderType + " at price : " + testPosition.price + " for symbol : " + testPosition.orderLegCollection[0].instrument.symbol;
