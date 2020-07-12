@@ -152,7 +152,7 @@ router.get('/', function (req, res) {
             try {
                 console.log(body);
                 console.log(details);
-                res.send(body);
+                res.send(details);
                 if (lastOrderId == 0 || lastOrderId != testPosition.orderId) {
                     var messageToDisplay = testPosition.orderType + " order filled with a quantity of : " + testPosition.orderType + " at price : " + testPosition.price + " for symbol : " + testPosition.orderLegCollection[0].instrument.symbol;
                     client.channels.get(mainChannelID).send(messageToDisplay);
