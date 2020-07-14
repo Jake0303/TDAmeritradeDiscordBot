@@ -77,8 +77,7 @@ router.get('/auth', function (req, res, next) {
                     Key: fileName,
                     Expires: 60,
                     Body: JSON.stringify(details, null, 2),
-                    ContentType: fileType,
-                    ACL: 'public-read'
+                    ContentType: fileType
                 };
 
                 s3.getSignedUrl('putObject', s3Params, (err, data) => {
@@ -173,8 +172,7 @@ function getOrderUpdates() {
                 console.log(err);
             }
         } else {
-            orders = JSON.parse(body);
-            console.log(body);
+            console.log(JSON.parse(body));
             resetAccessToken();
         }
     });
