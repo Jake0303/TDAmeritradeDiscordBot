@@ -29,6 +29,7 @@ const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
 
 console.log(process.env.AWS_ACCESS_KEY_ID);
+console.log(process.env.AWS_SECRET_ACCESS_KEY);
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -46,8 +47,12 @@ s3.getObject(params, function (err, data) {
     if (err) {
         console.log(err);
     }
-    console.log(data.Body.toString()); //this will log data to console
-    details = data.Body.toString();
+    try {
+        console.log(data.Body.toString()); //this will log data to console
+        details = data.Body.toString();
+    } catch (err) {
+        console.log(err);
+    }
 });
 
 /* 
