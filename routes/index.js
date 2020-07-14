@@ -27,9 +27,12 @@ const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
+
+console.log(process.env.AWS_ACCESS_KEY_ID);
+console.log(process.env.AWS_SECRET_ACCESS_KEY);
 const s3 = new aws.S3({
-    accessKeyId: 'AKIAJYCZ6FFICFJF4SVA',
-    secretAccessKey: '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',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     signatureVersion: 'v4'
 });
 // Setting up S3 upload parameters
@@ -84,8 +87,8 @@ router.get('/auth', function (req, res, next) {
                 details.refresh_token = authReply.refresh_token;
                 console.log(details);
                 const s3 = new aws.S3({
-                    accessKeyId: 'AKIAJYCZ6FFICFJF4SVA',
-                    secretAccessKey: '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',
+                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
                     signatureVersion: 'v4',
                     region: 'us-east-2'
                 });
