@@ -10,6 +10,7 @@ const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com'
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
 const Discord = require('discord.js');
+require('dotenv').config();
 const client = new Discord.Client();
 //On Discord Error
 client.on('error', err => {
@@ -21,15 +22,13 @@ client.on('ready', () => {
     exports.client = client;
 });
 client.login(process.env.DISCORDTOKEN);
-
-//require('dotenv').config()
 //Login Discord Bot
 const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
 
-console.log(process.env);
+console.log(process.env.AWS_ACCESS_KEY_ID);
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
