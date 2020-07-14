@@ -4,6 +4,7 @@ var request = require('request');
 var express = require('express');
 const puppeteer = require('puppeteer');
 var router = express.Router();
+var fs = require('fs');
 const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com');
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
@@ -73,7 +74,7 @@ router.get('/auth', function (req, res, next) {
         });
     } catch (err) {
         console.log(err);
-        res.send(err);
+        res.send({ "error": err });
     }
 });
 
