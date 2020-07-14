@@ -103,8 +103,8 @@ router.get('/', function (req, res) {
                 console.log(err);
             }
         } else {
-            console.log(error);
-            console.log(response);
+            res.send(JSON.parse(body));
+
         }
     });
 });
