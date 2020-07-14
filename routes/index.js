@@ -8,13 +8,14 @@ var fs = require('fs');
 const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com');
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
-const Discord = require('discord.js');
-const client = new Discord.Client();
+//const Discord = require('discord.js');
+//const client = new Discord.Client();
 require('dotenv').config()
 //Login Discord Bot
-client.login(process.env.DISCORDTOKEN);
+//client.login(process.env.DISCORDTOKEN);
 
 //On Discord Error
+/*
 client.on('error', err => {
     console.log(err);
 });
@@ -22,39 +23,52 @@ exports.client = client;
 //Kick cancelled students
 client.on('ready', () => {
     exports.client = client;
-});
+});*/
 var details = require(detailsFileName);
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
+// parse the tokens
+var authReply = { access_token: "test", refresh_token: "test" };
+// parse the response to a new object
+console.log(authReply);
 
+// update the details file object
+details.access_token = authReply.access_token;
+details.refresh_token = authReply.refresh_token;
+console.log(details);
+// write the updated object to the details.json file
+fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
+    if (err) console.error(err);
+});
 /* 
 Callback endpoint the TDA app uses.
 To understand more about how the API authenticates, see this link.
 https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
 router.get('/auth', function (req, res, next) {
-    try {
-        console.log(process.env.CLIENT_ID + "@AMER.OAUTHAP");
-        var authRequest = {
-            url: 'https://api.tdameritrade.com/v1/oauth2/token',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            form: {
-                'grant_type': 'authorization_code',
-                'access_type': 'offline',
-                'code': req.query.code, // get the code from url
-                'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
-                'redirect_uri': 'https://discordbottrades.herokuapp.com/auth'
-            }
-        };
+    console.log(process.env.CLIENT_ID + "@AMER.OAUTHAP");
+    var authRequest = {
+        url: 'https://api.tdameritrade.com/v1/oauth2/token',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        form: {
+            'grant_type': 'authorization_code',
+            'access_type': 'offline',
+            'code': req.query.code, // get the code from url
+            'client_id': process.env.CLIENT_ID + "@AMER.OAUTHAP", // this client id comes from config vars
+            'redirect_uri': 'https://discordbottrades.herokuapp.com/auth'
+        }
+    };
 
-        // make the post request
-        request(authRequest, function (error, response, body) {
+    // make the post request
+    request(authRequest, function (error, response, body) {
+        try {
+            // parse the tokens
+            var authReply = JSON.parse(body);
             if (!error && response.statusCode == 200) {
-                // parse the tokens
-                var authReply = JSON.parse(body);
+
                 // parse the response to a new object
                 console.log(authReply);
 
@@ -69,13 +83,14 @@ router.get('/auth', function (req, res, next) {
                 res.send({ "success": "Authorized!" });
             } else {
                 console.log(body);
-                res.send(body);
+                res.send(authReply);
             }
-        });
-    } catch (err) {
-        console.log(err);
-        res.send({ "error": err });
-    }
+        } catch (err) {
+            console.log(err);
+            res.send({ "error": err });
+        }
+    });
+
 });
 
 
