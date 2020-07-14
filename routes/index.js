@@ -2,6 +2,7 @@
 var http = require('http');
 var request = require('request');
 var express = require('express');
+const aws = require('aws-sdk');
 const puppeteer = require('puppeteer');
 var router = express.Router();
 var fs = require('fs');
@@ -13,7 +14,8 @@ const client = new Discord.Client();
 require('dotenv').config()
 //Login Discord Bot
 client.login(process.env.DISCORDTOKEN);
-
+const S3_BUCKET = process.env.S3_BUCKET_NAME;
+aws.config.region = 'us-east-2';
 //On Discord Error
 client.on('error', err => {
     console.log(err);
@@ -63,10 +65,33 @@ router.get('/auth', function (req, res, next) {
                 details.refresh_token = authReply.refresh_token;
                 console.log(details);
                 // write the updated object to the details.json file
-                fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
-                    if (err) console.error(err);
+                //fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
+                  //  if (err) console.error(err);
+                //});
+                const s3 = new aws.S3();
+                const fileName = 'details.json';
+                const fileType = "application/json";
+                const s3Params = {
+                    Bucket: S3_BUCKET,
+                    Key: fileName,
+                    Expires: 60,
+                    Body: JSON.stringify(details, null, 2),
+                    ContentType: fileType,
+                    ACL: 'public-read'
+                };
+
+                s3.getSignedUrl('putObject', s3Params, (err, data) => {
+                    if (err) {
+                        console.log(err);
+                        return res.end();
+                    }
+                    const returnData = {
+                        signedRequest: data,
+                        url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
+                    };
+                    res.send({ "success": "Authorized!" });
+
                 });
-                res.send({ "success": "Authorized!" });
             } else {
                 console.log(body);
                 res.send(authReply);
