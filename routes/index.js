@@ -47,8 +47,8 @@ s3.getObject(params, function (err, data) {
         console.log(err);
     }
     try {
-        console.log(data.Body.toString()); //this will log data to console
-        details = data.Body.toString();
+        details = JSON.parse(data.Body.toString());
+        console.log(details);
     } catch (err) {
         console.log(err);
     }
