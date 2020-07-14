@@ -160,7 +160,7 @@ router.get('/reset', async function (req, res, next) {
     }
 });
 
-var lastOrderId = 0;
+var lastOrderId = [];
 //Get open positions
 function getOrderUpdates() {
     console.log("Getting Order Updates");
@@ -177,13 +177,16 @@ function getOrderUpdates() {
         if (!error && response.statusCode == 200) {
             try {
                 var orders = JSON.parse(body);
-                console.log(orders[0]);
-                if (lastOrderId == 0 || lastOrderId != orders[0].orderId) {
-                    var messageToDisplay = orders[0].orderType + " order filled with a quantity of : " + orders[0].orderType + " at price : " + orders[0].price + " for symbol : " + orders[0].orderLegCollection[0].instrument.symbol;
-                    console.log(client.channels);
-                    client.channels.cache.get(mainChannelID).send(messageToDisplay);
-                    lastOrderId = orders[0].orderId;
-                }
+                if (orders.length) {
+                    for (var i = 0; i < orders.length; i++) {
+                        console.log(orders[i]);
+                        if (lastOrderId == 0 || !lastOrderId.includes(orders[i].orderId)) {
+                            var messageToDisplay = orders[i].orderType + " order filled with a quantity of : " + orders[i].filledQuantity + " at price : " + orders[i].price + " for symbol : " + orders[i].orderLegCollection[0].instrument.symbol;
+                            client.channels.cache.get(mainChannelID).send(messageToDisplay);
+                            lastOrderId.push(orders[i].orderId);
+                        }
+                    }
+                    }
             } catch (err) {
                 console.log(err);
             }
