@@ -11,11 +11,6 @@ const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
 const Discord = require('discord.js');
 const client = new Discord.Client();
-require('dotenv').config()
-//Login Discord Bot
-client.login(process.env.DISCORDTOKEN);
-const S3_BUCKET = process.env.S3_BUCKET_NAME;
-aws.config.region = 'us-east-2';
 //On Discord Error
 client.on('error', err => {
     console.log(err);
@@ -25,6 +20,13 @@ exports.client = client;
 client.on('ready', () => {
     exports.client = client;
 });
+client.login(process.env.DISCORDTOKEN);
+
+//require('dotenv').config()
+//Login Discord Bot
+const S3_BUCKET = process.env.S3_BUCKET_NAME;
+aws.config.region = 'us-east-2';
+
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -42,8 +44,8 @@ s3.getObject(params, function (err, data) {
     if (err) {
         console.log(err);
     }
-    console.log(data.Body); //this will log data to console
-    details = data.Body;
+    console.log(data.Body.toString()); //this will log data to console
+    details = data.Body.toString();
 });
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
@@ -87,7 +89,7 @@ router.get('/auth', function (req, res, next) {
                 });
                 // Setting up S3 upload parameters
                 const params = {
-                    Bucket: 'tdbot',
+                    Bucket: S3_BUCKET,
                     Key: 'details.json', // File name you want to save as in S3
                     Body: JSON.stringify(details, null, 2)
                 };
