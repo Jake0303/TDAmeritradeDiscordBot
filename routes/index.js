@@ -84,8 +84,8 @@ router.get('/auth', function (req, res, next) {
                 details.refresh_token = authReply.refresh_token;
                 console.log(details);
                 const s3 = new aws.S3({
-                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                    accessKeyId: 'AKIAJYCZ6FFICFJF4SVA',
+                    secretAccessKey: '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',
                     signatureVersion: 'v4',
                     region: 'us-east-2'
                 });
