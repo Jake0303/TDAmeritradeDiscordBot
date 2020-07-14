@@ -9,8 +9,8 @@ var fs = require('fs');
 const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com');
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
-const Discord = require('discord.js');
 require('dotenv').config();
+const Discord = require('discord.js');
 const client = new Discord.Client();
 //On Discord Error
 client.on('error', err => {
@@ -27,14 +27,10 @@ const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
-
-console.log(process.env.AWS_ACCESS_KEY_ID);
-console.log(process.env.AWS_SECRET_ACCESS_KEY);
 const s3 = new aws.S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    signatureVersion: 'v4',
-    region: 'us-east-2'
+    accessKeyId: 'AKIAJYCZ6FFICFJF4SVA',
+    secretAccessKey: '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',
+    signatureVersion: 'v4'
 });
 // Setting up S3 upload parameters
 const params = {
