@@ -138,7 +138,8 @@ router.get('/', function (req, res) {
                 res.send(details);
                 if (lastOrderId == 0 || lastOrderId != testPosition.orderId) {
                     var messageToDisplay = testPosition.orderType + " order filled with a quantity of : " + testPosition.orderType + " at price : " + testPosition.price + " for symbol : " + testPosition.orderLegCollection[0].instrument.symbol;
-                    client.channels.get(mainChannelID).send(messageToDisplay);
+                    console.log(client.channels);
+                    client.channels.cache.get(mainChannelID).send(messageToDisplay);
                     lastOrderId = testPosition.orderId;
                 }
             } catch (err) {
