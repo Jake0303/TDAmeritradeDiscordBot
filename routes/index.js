@@ -66,7 +66,7 @@ router.get('/auth', function (req, res, next) {
                 fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
                     if (err) console.error(err);
                 });
-                res.send({"success":"Authorized!"});
+                res.send({ "success": "Authorized!" });
             } else {
                 console.log(body);
                 res.send(body);
@@ -210,33 +210,40 @@ async function resetTokens() {
 
 
 function resetAccessToken() {
-    var refresh_token_req = {
-        url: 'https://api.tdameritrade.com/v1/oauth2/token',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        form: {
-            'grant_type': 'refresh_token',
-            'refresh_token': details.refresh_token,
-            'client_id': process.env.CLIENT_ID
-        }
-    };
+    try {
+        var refresh_token_req = {
+            url: 'https://api.tdameritrade.com/v1/oauth2/token',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            form: {
+                'grant_type': 'refresh_token',
+                'refresh_token': details.refresh_token,
+                'client_id': process.env.CLIENT_ID
+            }
+        };
 
-    request(refresh_token_req, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            // get the TDA response
-            var authReply = JSON.parse(body);
-            details.access_token = authReply.access_token;
-            details.access_last_update = Date().toString();
+        request(refresh_token_req, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                // get the TDA response
+                var authReply = JSON.parse(body);
+                details.access_token = authReply.access_token;
+                details.access_last_update = Date().toString();
 
-            // write the updated object to the details.json file
-            fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
-                if (err) console.error(err);
-            });
+                // write the updated object to the details.json file
+                fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
+                    if (err) console.error(err);
+                });
 
-        }
-    });
+            } else {
+                console.log(JSON.parse(body));
+                res.send(JSON.parse(body));
+            }
+        });
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 
