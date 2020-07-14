@@ -175,8 +175,8 @@ function getOrderUpdates() {
     request(refresh_token_req, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             try {
-                orders = JSON.parse(body);
-                console.log(body);
+                var orders = JSON.parse(body);
+                console.log(orders);
                 if (lastOrderId == 0 || lastOrderId != orders.orderId) {
                     var messageToDisplay = orders.orderType + " order filled with a quantity of : " + orders.orderType + " at price : " + orders.price + " for symbol : " + orders.orderLegCollection[0].instrument.symbol;
                     client.channels.get(mainChannelID).send(messageToDisplay);
@@ -191,7 +191,7 @@ function getOrderUpdates() {
         }
     });
 }
-setInterval(getOrderUpdates, 120000);
+setInterval(getOrderUpdates, 600);
 
 /*
 Automatically fill in the login form to authenticate the TDA app
