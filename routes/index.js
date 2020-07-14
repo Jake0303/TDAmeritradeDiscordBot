@@ -25,7 +25,26 @@ exports.client = client;
 client.on('ready', () => {
     exports.client = client;
 });
-var details = require(detailsFileName);
+const s3 = new aws.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    signatureVersion: 'v4',
+    region: 'us-east-2'
+});
+// Setting up S3 upload parameters
+const params = {
+    Bucket: 'tdbot',
+    Key: 'details.json', // File name you want to save as in S3
+};
+var details = {};
+// Uploading files to the bucket
+s3.getObject(params, function (err, data) {
+    if (err) {
+        console.log(err);
+    }
+    console.log(data.Body); //this will log data to console
+    details = data.Body;
+});
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
 /* 
@@ -60,39 +79,27 @@ router.get('/auth', function (req, res, next) {
                 details.access_token = authReply.access_token;
                 details.refresh_token = authReply.refresh_token;
                 console.log(details);
-                // write the updated object to the details.json file
-                //fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
-                  //  if (err) console.error(err);
-                //});
                 const s3 = new aws.S3({
                     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
                     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
                     signatureVersion: 'v4',
                     region: 'us-east-2'
                 });
-                const fileName = 'details.json';
-                const fileType = "application/json";
-                const s3Params = {
-                    Bucket: S3_BUCKET,
-                    Key: fileName,
-                    Expires: 60,
-                    Body: JSON.stringify(details, null, 2),
-                    ContentType: fileType
+                // Setting up S3 upload parameters
+                const params = {
+                    Bucket: 'tdbot',
+                    Key: 'details.json', // File name you want to save as in S3
+                    Body: JSON.stringify(details, null, 2)
                 };
 
-                s3.getSignedUrl('putObject', s3Params, (err, data) => {
+                // Uploading files to the bucket
+                s3.upload(params, function (err, data) {
                     if (err) {
-                        console.log(err);
-                        return res.end();
+                        throw err;
                     }
-                    const returnData = {
-                        signedRequest: data,
-                        url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
-                    };
-                    console.log(returnData);
-                    res.send({ "success": "Authorized!" });
-
+                    console.log(`File uploaded successfully. ${data.Location}`);
                 });
+                res.send({ "success": "authorized" });
             } else {
                 console.log(body);
                 res.send(authReply);
