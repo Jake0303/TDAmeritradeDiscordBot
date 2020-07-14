@@ -239,7 +239,6 @@ function resetAccessToken() {
 
             } else {
                 console.log(JSON.parse(body));
-                res.send(JSON.parse(body));
             }
         });
     } catch (err) {
