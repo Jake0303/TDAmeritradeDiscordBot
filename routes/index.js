@@ -56,10 +56,6 @@ router.get('/auth', function (req, res, next) {
             // parse the tokens
             var authReply = JSON.parse(body);
             if (!error && response.statusCode == 200) {
-
-                // parse the response to a new object
-                console.log(authReply);
-
                 // update the details file object
                 details.access_token = authReply.access_token;
                 details.refresh_token = authReply.refresh_token;
@@ -68,7 +64,12 @@ router.get('/auth', function (req, res, next) {
                 //fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
                   //  if (err) console.error(err);
                 //});
-                const s3 = new aws.S3();
+                const s3 = new aws.S3({
+                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                    signatureVersion: 'v4',
+                    region: 'us-east-2'
+                });
                 const fileName = 'details.json';
                 const fileType = "application/json";
                 const s3Params = {
@@ -89,6 +90,7 @@ router.get('/auth', function (req, res, next) {
                         signedRequest: data,
                         url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
                     };
+                    console.log(returnData);
                     res.send({ "success": "Authorized!" });
 
                 });
@@ -171,7 +173,8 @@ function getOrderUpdates() {
                 console.log(err);
             }
         } else {
-            console.log("Resetting tokens");
+            orders = JSON.parse(body);
+            console.log(body);
             resetAccessToken();
         }
     });
