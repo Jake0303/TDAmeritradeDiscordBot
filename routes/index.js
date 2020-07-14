@@ -26,7 +26,10 @@ client.login(process.env.DISCORDTOKEN);
 //Login Discord Bot
 const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
+const Days90 = 7776000; // 90 days in seconds
+const Minutes30 = 1800 // 30 mins in seconds
 
+console.log(process.env);
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -36,7 +39,7 @@ const s3 = new aws.S3({
 // Setting up S3 upload parameters
 const params = {
     Bucket: 'tdbot',
-    Key: 'details.json', // File name you want to save as in S3
+    Key: 'details.json' // File name you want to save as in S3
 };
 var details = {};
 // Uploading files to the bucket
@@ -47,8 +50,7 @@ s3.getObject(params, function (err, data) {
     console.log(data.Body.toString()); //this will log data to console
     details = data.Body.toString();
 });
-const Days90 = 7776000; // 90 days in seconds
-const Minutes30 = 1800 // 30 mins in seconds
+
 /* 
 Callback endpoint the TDA app uses.
 To understand more about how the API authenticates, see this link.
