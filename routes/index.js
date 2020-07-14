@@ -165,7 +165,7 @@ function getOrderUpdates() {
     console.log("Getting Order Updates");
     var refresh_token_req = {
         url: 'https://api.tdameritrade.com/v1/orders',
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': 'Bearer ' + details.access_token
@@ -272,9 +272,25 @@ function resetAccessToken() {
                 details.access_token = authReply.access_token;
                 details.access_last_update = Date().toString();
 
-                // write the updated object to the details.json file
-                fs.writeFileSync(detailsFileName, JSON.stringify(details, null, 2), function (err) {
-                    if (err) console.error(err);
+                const s3 = new aws.S3({
+                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                    signatureVersion: 'v4',
+                    region: 'us-east-2'
+                });
+                // Setting up S3 upload parameters
+                const params = {
+                    Bucket: S3_BUCKET,
+                    Key: 'details.json', // File name you want to save as in S3
+                    Body: JSON.stringify(details, null, 2)
+                };
+
+                // Uploading files to the bucket
+                s3.upload(params, function (err, data) {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log(`File uploaded successfully. ${data.Location}`);
                 });
 
             } else {
