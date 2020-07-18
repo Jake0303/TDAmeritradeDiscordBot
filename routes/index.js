@@ -22,6 +22,15 @@ client.on('ready', () => {
     exports.client = client;
 });
 client.login(process.env.DISCORDTOKEN);
+//Relay messages from Discord and post to them a forum ticker automatically if it contains ($)
+client.on('message', function (message) {
+    if (message.content === '/stop') {
+        message.channel.send('TMCTD has stopped tracking your trades.');
+    }
+    if (message.content === '/start') {
+        message.channel.send('TMCTD has started tracking your trades.');
+    }
+});
 //Login Discord Bot
 const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
@@ -40,7 +49,7 @@ const params = {
     Bucket: 'tdbot',
     Key: 'details.json' // File name you want to save as in S3
 };
-var details = {};
+var details = [];
 // Uploading files to the bucket
 s3.getObject(params, function (err, data) {
     if (err) {
@@ -83,8 +92,7 @@ router.get('/auth', function (req, res, next) {
             var authReply = JSON.parse(body);
             if (!error && response.statusCode == 200) {
                 // update the details file object
-                details.access_token = authReply.access_token;
-                details.refresh_token = authReply.refresh_token;
+                details.push[{ access_token: authReply.access_token, refresh_token: authReply.refresh_token }];
                 console.log(details);
                 const s3 = new aws.S3({
                     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -164,37 +172,59 @@ var lastOrderId = [];
 //Get open positions
 function getOrderUpdates() {
     console.log("Getting Order Updates");
-    var refresh_token_req = {
-        url: 'https://api.tdameritrade.com/v1/orders',
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + details.access_token
-        }
-    };
-    //Make the request and get positions
-    request(refresh_token_req, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            try {
-                var orders = JSON.parse(body);
-                if (orders.length) {
-                    for (var i = 0; i < orders.length; i++) {
-                        console.log(orders[i]);
-                        if (lastOrderId == 0 || !lastOrderId.includes(orders[i].orderId)) {
-                            var messageToDisplay = orders[i].orderType + " order filled with a quantity of : " + orders[i].filledQuantity + " at price : " + orders[i].price + " for symbol : " + orders[i].orderLegCollection[0].instrument.symbol;
-                            client.channels.cache.get(mainChannelID).send(messageToDisplay);
-                            lastOrderId.push(orders[i].orderId);
+    for (var index in details) {
+        var refresh_token_req = {
+            url: 'https://api.tdameritrade.com/v1/orders',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Bearer ' + details[index].access_token
+            }
+        };
+        //Make the request and get positions
+        request(refresh_token_req, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                try {
+                    var orders = JSON.parse(body);
+                    if (orders.length) {
+                        for (var i = 0; i < orders.length; i++) {
+                            console.log(orders[i]);
+                            var messageToDisplay = ''
+                            if ((lastOrderId == 0 || !lastOrderId.includes(orders[i].orderId)) && orders[i].status == 'FILLED') {
+                                if (orders[i].orderLegCollection[0].instruction == 'BUY') {
+                                    orders[i].orderLegCollection[0].instruction = 'BOT';
+                                    if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
+                                        messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
+                                    else
+                                        messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                }
+                                else {
+                                    orders[i].orderLegCollection[0].instruction = 'SOLD';
+                                    if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
+                                        messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
+                                    else
+                                        messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                }
+
+                                if (index == 0)
+                                    client.channels.cache.get(mainChannelID).send(messageToDisplay);
+                                else if (index == 1)
+                                    client.channels.cache.get('730906624226623531').send(messageToDisplay);
+                                else
+                                    client.channels.cache.get('730906609982898270').send(messageToDisplay);
+                                lastOrderId.push(orders[i].orderId);
+                            }
                         }
                     }
-                    }
-            } catch (err) {
-                console.log(err);
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                console.log(JSON.parse(body));
+                resetAccessToken();
             }
-        } else {
-            console.log(JSON.parse(body));
-            resetAccessToken();
-        }
-    });
+        });
+    }
 }
 setInterval(getOrderUpdates, 5000);
 
@@ -257,54 +287,57 @@ async function resetTokens() {
 
 function resetAccessToken() {
     try {
-        var refresh_token_req = {
-            url: 'https://api.tdameritrade.com/v1/oauth2/token',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            form: {
-                'grant_type': 'refresh_token',
-                'refresh_token': details.refresh_token,
-                'client_id': process.env.CLIENT_ID
-            }
-        };
+        for (var index in details) {
+            var refresh_token_req = {
+                url: 'https://api.tdameritrade.com/v1/oauth2/token',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                form: {
+                    'grant_type': 'refresh_token',
+                    'refresh_token': details[index].refresh_token,
+                    'client_id': process.env.CLIENT_ID
+                }
+            };
 
-        request(refresh_token_req, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                // get the TDA response
-                var authReply = JSON.parse(body);
-                details.access_token = authReply.access_token;
-                details.access_last_update = Date().toString();
+            request(refresh_token_req, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    // get the TDA response
+                    var authReply = JSON.parse(body);
+                    details[index].access_token = authReply.access_token;
+                    details[index].access_last_update = Date().toString();
 
-                const s3 = new aws.S3({
-                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-                    signatureVersion: 'v4',
-                    region: 'us-east-2'
-                });
-                // Setting up S3 upload parameters
-                const params = {
-                    Bucket: S3_BUCKET,
-                    Key: 'details.json', // File name you want to save as in S3
-                    Body: JSON.stringify(details, null, 2)
-                };
+                    const s3 = new aws.S3({
+                        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                        signatureVersion: 'v4',
+                        region: 'us-east-2'
+                    });
+                    // Setting up S3 upload parameters
+                    const params = {
+                        Bucket: S3_BUCKET,
+                        Key: 'details.json', // File name you want to save as in S3
+                        Body: JSON.stringify(details, null, 2)
+                    };
 
-                // Uploading files to the bucket
-                s3.upload(params, function (err, data) {
-                    if (err) {
-                        throw err;
-                    }
-                    console.log(`File uploaded successfully. ${data.Location}`);
-                });
+                    // Uploading files to the bucket
+                    s3.upload(params, function (err, data) {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log(`File uploaded successfully. ${data.Location}`);
+                    });
 
-            } else {
-                console.log(JSON.parse(body));
-            }
-        });
+                } else {
+                    console.log(JSON.parse(body));
+                }
+            });
+        }
     } catch (err) {
         console.log(err);
     }
+
 }
 
 
