@@ -69,7 +69,6 @@ To understand more about how the API authenticates, see this link.
 https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
 router.get('/auth', function (req, res, next) {
-    console.log(process.env.CLIENT_ID + "@AMER.OAUTHAP");
     var authRequest = {
         url: 'https://api.tdameritrade.com/v1/oauth2/token',
         method: 'POST',
@@ -121,7 +120,7 @@ router.get('/auth', function (req, res, next) {
             }
         } catch (err) {
             console.log(err);
-            res.send({ "error": err });
+            res.send(authReply);
         }
     });
 
@@ -226,7 +225,7 @@ function getOrderUpdates() {
         });
     }
 }
-setInterval(getOrderUpdates, 5000);
+setInterval(getOrderUpdates, 15000);
 
 /*
 Automatically fill in the login form to authenticate the TDA app
