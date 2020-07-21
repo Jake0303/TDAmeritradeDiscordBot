@@ -186,34 +186,44 @@ function getOrderUpdates() {
                     var orders = JSON.parse(body);
                     if (orders.length) {
                         for (var i = 0; i < orders.length; i++) {
-                            console.log(orders[i]);
-                            var messageToDisplay = ''
-                            if ((lastOrderId == 0 || !lastOrderId.includes(orders[i].orderId)) && orders[i].status == 'FILLED') {
-                                if (orders[i].orderLegCollection[0].instruction == 'BUY') {
-                                    orders[i].orderLegCollection[0].instruction = 'BOT';
-                                    if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
-                                        messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
+                            try {
+                                var messageToDisplay = ''
+                                if ((lastOrderId == 0 || !lastOrderId.includes(orders[i].orderId)) && orders[i].status == 'FILLED') {
+                                    if (orders[i].orderLegCollection[0].instruction == 'BUY') {
+                                        orders[i].orderLegCollection[0].instruction = 'BOT';
+                                        if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
+                                            messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
+                                        else {
+                                            console.log(orders[i].orderLegCollection[0].instrument);
+                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+
+                                        }
+                                    }
+                                    else {
+                                        orders[i].orderLegCollection[0].instruction = 'SOLD';
+                                        if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
+                                            messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
+                                        else {
+                                            console.log(orders[i].orderLegCollection[0].instrument);
+                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                        }
+                                    }
+
+                                    if (index == 0)
+                                        client.channels.cache.get(mainChannelID).send(messageToDisplay);
+                                    else if (index == 1)
+                                        client.channels.cache.get('730906624226623531').send(messageToDisplay);
                                     else
-                                        messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
-                                }
-                                else {
-                                    orders[i].orderLegCollection[0].instruction = 'SOLD';
-                                    if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
-                                        messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
-                                    else
-                                        messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                        client.channels.cache.get('730906609982898270').send(messageToDisplay);
+                                    lastOrderId.push(messageToDisplay+orders[i].enteredTime);
                                 }
 
-                                if (index == 0)
-                                    client.channels.cache.get(mainChannelID).send(messageToDisplay);
-                                else if (index == 1)
-                                    client.channels.cache.get('730906624226623531').send(messageToDisplay);
-                                else
-                                    client.channels.cache.get('730906609982898270').send(messageToDisplay);
-                                lastOrderId.push(orders[i].orderId);
+                            } catch (err) {
+                                console.log(err);
                             }
                         }
                     }
+
                 } catch (err) {
                     console.log(err);
                 }
