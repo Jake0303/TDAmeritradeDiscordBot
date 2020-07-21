@@ -336,7 +336,6 @@ function resetAccessToken() {
                         if (err) {
                             console.log(err);
                         }
-                        console.log(JSON.stringify(details, null, 2));
                     });
 
                 } else {
