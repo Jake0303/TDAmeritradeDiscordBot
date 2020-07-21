@@ -57,7 +57,6 @@ s3.getObject(params, function (err, data) {
     }
     try {
         details = JSON.parse(data.Body.toString());
-        console.log(details);
     } catch (err) {
         console.log(err);
     }
@@ -91,7 +90,7 @@ router.get('/auth', function (req, res, next) {
             var authReply = JSON.parse(body);
             if (!error && response.statusCode == 200) {
                 // update the details file object
-                details.push[{ access_token: authReply.access_token, refresh_token: authReply.refresh_token }];
+                details.push({ access_token: authReply.access_token, refresh_token: authReply.refresh_token });
                 console.log(details);
                 const s3 = new aws.S3({
                     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
