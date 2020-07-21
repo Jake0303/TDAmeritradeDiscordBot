@@ -189,7 +189,7 @@ function getOrderUpdates() {
                                             messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
                                         else {
                                             console.log(orders[i].orderLegCollection[0].instrument);
-                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + orders[i].orderLegCollection[0].instrument.description + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
 
                                         }
                                     }
@@ -199,7 +199,7 @@ function getOrderUpdates() {
                                             messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
                                         else {
                                             console.log(orders[i].orderLegCollection[0]);
-                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.description + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + orders[i].orderLegCollection[0].instrument.description + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
                                         }
                                     }
                                     if (!lastOrderId.includes(messageToDisplay + orders[i].enteredTime)) {
