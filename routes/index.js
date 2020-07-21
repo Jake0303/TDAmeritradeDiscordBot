@@ -108,7 +108,7 @@ router.get('/auth', function (req, res, next) {
                 // Uploading files to the bucket
                 s3.upload(params, function (err, data) {
                     if (err) {
-                        throw err;
+                        console.log(err);
                     }
                     console.log(`File uploaded successfully. ${data.Location}`);
                 });
@@ -312,6 +312,7 @@ function resetAccessToken() {
 
             request(refresh_token_req, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
+                    console.log('Successfully reset access token.');
                     // get the TDA response
                     var authReply = JSON.parse(body);
                     details[index].access_token = authReply.access_token;
@@ -333,13 +334,15 @@ function resetAccessToken() {
                     // Uploading files to the bucket
                     s3.upload(params, function (err, data) {
                         if (err) {
-                            throw err;
+                            console.log(err);
                         }
-                        console.log(`File uploaded successfully. ${data.Location}`);
+                        console.log(JSON.stringify(details, null, 2));
                     });
 
                 } else {
-                    console.log(JSON.parse(body));
+                    console.log('Could not reset access token.');
+                    console.log(details[index].refresh_token);
+                    console.log(process.env.CLIENT_ID);
                 }
             });
         }
