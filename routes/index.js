@@ -182,7 +182,7 @@ function getOrderUpdates() {
                         for (var i = 0; i < orders.length; i++) {
                             try {
                                 var messageToDisplay = ''
-                                if ((lastOrderId == 0) && orders[i].status == 'FILLED') {
+                                if (orders[i].status == 'FILLED') {
                                     if (orders[i].orderLegCollection[0].instruction == 'BUY') {
                                         orders[i].orderLegCollection[0].instruction = 'BOT';
                                         if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
@@ -199,7 +199,7 @@ function getOrderUpdates() {
                                             messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @" + orders[i].price;
                                         else {
                                             console.log(orders[i].orderLegCollection[0]);
-                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].deliverableUnits + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
+                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.underlyingSymbol + "(" + orders[i].orderLegCollection[0].instrument.optionsDeliverables[0].symbol + ")" + orders[i].orderLegCollection[0].instrument.description + " " + orders[i].orderLegCollection[0].instrument.putCall + " @" + orders[i].price;
                                         }
                                     }
                                     if (!lastOrderId.includes(messageToDisplay + orders[i].enteredTime)) {
