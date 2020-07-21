@@ -36,9 +36,6 @@ const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
 const Days90 = 7776000; // 90 days in seconds
 const Minutes30 = 1800 // 30 mins in seconds
-
-console.log(process.env.AWS_ACCESS_KEY_ID);
-console.log(process.env.AWS_SECRET_ACCESS_KEY);
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -91,7 +88,6 @@ router.get('/auth', function (req, res, next) {
             if (!error && response.statusCode == 200) {
                 // update the details file object
                 details.push({ access_token: authReply.access_token, refresh_token: authReply.refresh_token });
-                console.log(details);
                 const s3 = new aws.S3({
                     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
                     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -114,7 +110,6 @@ router.get('/auth', function (req, res, next) {
                 });
                 res.send({ "success": "authorized" });
             } else {
-                console.log(body);
                 res.send(authReply);
             }
         } catch (err) {
@@ -127,7 +122,6 @@ router.get('/auth', function (req, res, next) {
 
 
 router.get('/', function (req, res) {
-    console.log(details);
     var refresh_token_req = {
         url: 'https://api.tdameritrade.com/v1/orders',
         method: 'GET',
@@ -230,7 +224,7 @@ function getOrderUpdates() {
                 }
             } else {
                 console.log(JSON.parse(body));
-                resetAccessToken();
+                resetAccessToken(index);
             }
         });
     }
@@ -294,57 +288,56 @@ async function resetTokens() {
 }
 
 
-function resetAccessToken() {
+function resetAccessToken(index) {
     try {
-        for (var index in details) {
-            var refresh_token_req = {
-                url: 'https://api.tdameritrade.com/v1/oauth2/token',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                form: {
-                    'grant_type': 'refresh_token',
-                    'refresh_token': details[index].refresh_token,
-                    'client_id': process.env.CLIENT_ID
-                }
-            };
+        var refresh_token_req = {
+            url: 'https://api.tdameritrade.com/v1/oauth2/token',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            form: {
+                'grant_type': 'refresh_token',
+                'refresh_token': details[index].refresh_token,
+                'client_id': process.env.CLIENT_ID
+            }
+        };
 
-            request(refresh_token_req, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    console.log('Successfully reset access token.');
-                    // get the TDA response
-                    var authReply = JSON.parse(body);
-                    details[index].access_token = authReply.access_token;
-                    details[index].access_last_update = Date().toString();
+        request(refresh_token_req, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log('Successfully reset access token.');
+                // get the TDA response
+                var authReply = JSON.parse(body);
+                details[index].access_token = authReply.access_token;
+                details[index].access_last_update = Date().toString();
 
-                    const s3 = new aws.S3({
-                        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-                        signatureVersion: 'v4',
-                        region: 'us-east-2'
-                    });
-                    // Setting up S3 upload parameters
-                    const params = {
-                        Bucket: S3_BUCKET,
-                        Key: 'details.json', // File name you want to save as in S3
-                        Body: JSON.stringify(details, null, 2)
-                    };
+                const s3 = new aws.S3({
+                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                    signatureVersion: 'v4',
+                    region: 'us-east-2'
+                });
+                // Setting up S3 upload parameters
+                const params = {
+                    Bucket: S3_BUCKET,
+                    Key: 'details.json', // File name you want to save as in S3
+                    Body: JSON.stringify(details, null, 2)
+                };
 
-                    // Uploading files to the bucket
-                    s3.upload(params, function (err, data) {
-                        if (err) {
-                            console.log(err);
-                        }
-                    });
+                // Uploading files to the bucket
+                s3.upload(params, function (err, data) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
 
-                } else {
-                    console.log('Could not reset access token.');
-                    console.log(details[index].refresh_token);
-                    console.log(process.env.CLIENT_ID);
-                }
-            });
-        }
+            } else {
+                console.log('Could not reset access token.');
+                console.log(details[index].refresh_token);
+                console.log(process.env.CLIENT_ID);
+            }
+        });
+
     } catch (err) {
         console.log(err);
     }
