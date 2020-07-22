@@ -183,7 +183,7 @@ function getOrderUpdates() {
                             try {
                                 var messageToDisplay = ''
                                 if (orders[i].status == 'FILLED') {
-                                    if (orders[i].price == null || orders[i].price == undefined || orders[i].price.includes('undefined'))
+                                    if (orders[i].price == null || orders[i].price == undefined || orders[i].price == 'undefined')
                                         orders[i].price = 'MARKET';
                                     if (orders[i].orderLegCollection[0].instruction == 'BUY'
                                         || (orders[i].orderLegCollection != null && orders[i].orderLegCollection.length > 0 && orders[i].orderLegCollection[0].positionEffect == 'OPENING')) {
