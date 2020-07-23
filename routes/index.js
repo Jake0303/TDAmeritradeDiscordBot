@@ -192,7 +192,7 @@ function getOrderUpdates() {
                                             messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @ " + orders[i].price;
                                         else {
                                             console.log(orders[i].orderLegCollection[0].instrument);
-                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " +orders[i].orderLegCollection[0].instrument.description + " @ " + orders[i].price;
+                                            messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.description + " @ " + orders[i].price;
 
                                         }
                                     }
@@ -212,7 +212,7 @@ function getOrderUpdates() {
                                             client.channels.cache.get('730906624226623531').send(messageToDisplay);
                                         else
                                             client.channels.cache.get('730906609982898270').send(messageToDisplay);
-                                        lastOrderId.push(messageToDisplay + orders[i].enteredTime);
+                                        lastOrderId.push(index + messageToDisplay + orders[i].enteredTime + orders[i].closeTime + orders[i].orderId);
                                     }
                                 }
 
