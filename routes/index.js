@@ -162,12 +162,12 @@ router.get('/reset', async function (req, res, next) {
 
 var lastOrderId = [];
 // Setting up S3 upload parameters
-const params = {
+const orderparams = {
     Bucket: 'tdbot',
     Key: 'orders.json' // File name you want to save as in S3
 };
 // Uploading files to the bucket
-s3.getObject(params, function (err, data) {
+s3.getObject(orderparams, function (err, data) {
     if (err) {
         console.log(err);
     }
@@ -236,14 +236,14 @@ function getOrderUpdates() {
                                             region: 'us-east-2'
                                         });
                                         // Setting up S3 upload parameters
-                                        const params = {
+                                        const uploadparams = {
                                             Bucket: S3_BUCKET,
                                             Key: 'orders.json', // File name you want to save as in S3
                                             Body: JSON.stringify(lastOrderId, null, 2)
                                         };
 
                                         // Uploading files to the bucket
-                                        s3.upload(params, function (err, data) {
+                                        s3.upload(uploadparams, function (err, data) {
                                             if (err) {
                                                 console.log(err);
                                             }
