@@ -222,8 +222,8 @@ function getOrderUpdates() {
                                         }
                                     }
                                     if (!lastOrderId.includes(index + messageToDisplay + orders[i].enteredTime + orders[i].orderId)) {
-                                        if (index == 0)
-                                            client.channels.cache.get(mainChannelID).send(messageToDisplay);
+                                        //if (index == 0)
+                                        client.channels.cache.get(mainChannelID).send(messageToDisplay);
                                         //else if (index == 1)
                                           //  client.channels.cache.get('730906624226623531').send(messageToDisplay);
                                         //else
