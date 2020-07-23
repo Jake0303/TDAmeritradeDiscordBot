@@ -161,6 +161,22 @@ router.get('/reset', async function (req, res, next) {
 });
 
 var lastOrderId = [];
+// Setting up S3 upload parameters
+const params = {
+    Bucket: 'tdbot',
+    Key: 'orders.json' // File name you want to save as in S3
+};
+// Uploading files to the bucket
+s3.getObject(params, function (err, data) {
+    if (err) {
+        console.log(err);
+    }
+    try {
+        lastOrderId = JSON.parse(data.Body.toString());
+    } catch (err) {
+        console.log(err);
+    }
+});
 //Get open positions
 function getOrderUpdates() {
     console.log("Getting Order Updates");
@@ -205,14 +221,34 @@ function getOrderUpdates() {
                                             messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.description + " @ " + orders[i].price;
                                         }
                                     }
-                                    if (!lastOrderId.includes(messageToDisplay + orders[i].enteredTime)) {
+                                    if (!lastOrderId.includes(index + messageToDisplay + orders[i].enteredTime + orders[i].orderId)) {
                                         if (index == 0)
                                             client.channels.cache.get(mainChannelID).send(messageToDisplay);
-                                        else if (index == 1)
-                                            client.channels.cache.get('730906624226623531').send(messageToDisplay);
-                                        else
-                                            client.channels.cache.get('730906609982898270').send(messageToDisplay);
+                                        //else if (index == 1)
+                                          //  client.channels.cache.get('730906624226623531').send(messageToDisplay);
+                                        //else
+                                          //  client.channels.cache.get('730906609982898270').send(messageToDisplay);
                                         lastOrderId.push(index + messageToDisplay + orders[i].enteredTime + orders[i].orderId);
+                                        const s3 = new aws.S3({
+                                            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                                            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                                            signatureVersion: 'v4',
+                                            region: 'us-east-2'
+                                        });
+                                        // Setting up S3 upload parameters
+                                        const params = {
+                                            Bucket: S3_BUCKET,
+                                            Key: 'orders.json', // File name you want to save as in S3
+                                            Body: JSON.stringify(lastOrderId, null, 2)
+                                        };
+
+                                        // Uploading files to the bucket
+                                        s3.upload(params, function (err, data) {
+                                            if (err) {
+                                                console.log(err);
+                                            }
+                                            console.log(`File uploaded successfully. ${data.Location}`);
+                                        });
                                     }
                                 }
 
