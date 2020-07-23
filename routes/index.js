@@ -212,7 +212,7 @@ function getOrderUpdates() {
                                             client.channels.cache.get('730906624226623531').send(messageToDisplay);
                                         else
                                             client.channels.cache.get('730906609982898270').send(messageToDisplay);
-                                        lastOrderId.push(index + messageToDisplay + orders[i].enteredTime + orders[i].closeTime + orders[i].orderId);
+                                        lastOrderId.push(index + messageToDisplay + orders[i].enteredTime + orders[i].orderId);
                                     }
                                 }
 
