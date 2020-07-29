@@ -1,0 +1,16 @@
+﻿extends layout
+
+block content
+  h1 Update
+  hr
+  form(method='POST' action='/update/'+user.userid)
+    fieldset
+        label(for='key') License Key :
+        input#key(type='text' value=user.key name='key')
+    fieldset
+        label(for='serverID') Discord Server ID :
+        input#serverID(type='text' value=user.serverID name='serverID')
+    fieldset
+        label(for='channelID') Discord Channel ID :
+        input#channelID(type='text' value=user.channelID name='channelID')
+    input(type='submit' value='Update') Update

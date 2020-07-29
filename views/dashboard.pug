@@ -1,0 +1,24 @@
+﻿extends layout
+
+block content
+  h1 Dashboard
+  hr
+  table
+    th License Key
+    th Server ID
+    th Channel ID
+    th Update
+    th Delete
+    if (users)
+        each user in users
+            tr
+                td user.key
+                td user.serverID
+                td user.channelID
+                td
+                    a(href="/update/user.userid") Update
+                td
+                    form(method='POST' action='/delete/'+user.userid)
+                        input(type='submit' value='Delete')
+    else
+        h1 No users yet...

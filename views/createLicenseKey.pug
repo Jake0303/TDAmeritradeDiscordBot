@@ -1,0 +1,9 @@
+﻿extends layout
+
+block content
+  h1 Create License Key
+  hr
+  form#createLicenseKeyForm
+    button(type='submit' value='Generate License Key') Generate License Key
+  include scripts.pug
+  script(src="/javascripts/licensekey.js")
