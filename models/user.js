@@ -69,12 +69,12 @@ exports.getById = function (userid, done) {
 };
 
 exports.get = function (done) {
-    connection.get().query('SELECT * FROM `users`', function (error, result) {
+    connection.get().query('SELECT * FROM users', function (error, result) {
         if (error) {
             console.log(error);
             return done(error);
         }
 
-        done(result);
+        return done(result);
     });
 };

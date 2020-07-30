@@ -190,7 +190,8 @@ router.get('/', function (req, res) {
 
 router.get('/dashboard', function (req, res) {
     userModel.get(function (err, users) {
-        res.render('dashboard', users);
+        console.log(users);
+        res.render('dashboard', {users:users);
     });
 });
 
