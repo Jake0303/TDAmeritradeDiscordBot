@@ -75,6 +75,6 @@ exports.get = function (done) {
             return done(error);
         }
 
-        return done(result);
+        return done(null,result);
     });
 };
