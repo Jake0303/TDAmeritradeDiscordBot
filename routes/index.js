@@ -191,7 +191,7 @@ router.get('/', function (req, res) {
 router.get('/dashboard', function (req, res) {
     userModel.get(function (err, users) {
         console.log(users);
-        res.render('dashboard', {users:users);
+        res.render('dashboard', { users: users });
     });
 });
 
