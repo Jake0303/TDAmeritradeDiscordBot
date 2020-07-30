@@ -117,7 +117,7 @@ router.get('/auth', function (req, res, next) {
             // parse the tokens
             var authReply = JSON.parse(body);
             if (!error && response.statusCode == 200) {
-                // update the details file object
+                /* update the details file object
                 details.push({ accesstoken: authReply.accesstoken, refreshtoken: authReply.refreshtoken });
                 const s3 = new aws.S3({
                     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -138,15 +138,14 @@ router.get('/auth', function (req, res, next) {
                         console.log(err);
                     }
                     console.log(`File uploaded successfully. ${data.Location}`);
-                });
+                });*/
+                console.log(authReply);
                 var newUser = {
-                    accesstoken: authReply.accesstoken,
-                    refreshtoken: authReply.refreshtoken,
-
+                    accesstoken: authReply.access_token,
+                    refreshtoken: authReply.refresh_token
                 }
-                userModel.create(newUser, function (err, done) {
-
-                });
+                console.log(newUser);
+                userModel.create(newUser, function (err, done) {});
                 res.send({ "success": "authorized" });
             } else {
                 res.send(authReply);
