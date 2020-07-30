@@ -60,8 +60,8 @@ client.on('message', function (message) {
 //Models
 const licenseKeyModel = require('../models/token');
 const userModel = require('../models/user');
-userModel.createSchema(function (err, done) { });
-licenseKeyModel.createSchema(function (err, done) {});
+//userModel.createSchema(function (err, done) { });
+//licenseKeyModel.createSchema(function (err, done) {});
 //Login Discord Bot
 const S3_BUCKET = process.env.S3_BUCKET_NAME;
 aws.config.region = 'us-east-2';
@@ -184,13 +184,13 @@ router.post('/generateLicenseKey', function (req, res) {
 
 router.get('/', function (req, res) {
     userModel.get(function (err, users) {
-        res.render('dashboard', { users: users });
+        res.render('dashboard', users);
     });
 });
 
 router.get('/dashboard', function (req, res) {
     userModel.get(function (err, users) {
-        res.render('dashboard', { users: users });
+        res.render('dashboard', users);
     });
 });
 
