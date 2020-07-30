@@ -13,14 +13,20 @@ exports.createSchema = function (done) {
     });
 };
 
-exports.create = function (user, done) {
+exports.create = function (user, licenseKey, done) {
     connection.get().query('INSERT INTO `users` SET ?', user, function (error, result) {
         if (error) {
             console.log(error);
             return done(error);
         }
+        connection.get().query('UPDATE licenseKey SET userid = ? WHERE key = ?', [user.userid, licenseKey], function (error, result) {
+            if (error) {
+                console.log(error);
+                return done(error);
+            }
 
-        done(null, result.insertId);
+            done(null, result.insertId);
+        });
     });
 };
 
