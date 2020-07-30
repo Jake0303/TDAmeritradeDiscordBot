@@ -139,14 +139,14 @@ router.get('/auth', function (req, res, next) {
                     }
                     console.log(`File uploaded successfully. ${data.Location}`);
                 });*/
-                console.log(authReply);
                 var newUser = {
                     accesstoken: authReply.access_token,
                     refreshtoken: authReply.refresh_token
                 }
                 console.log(newUser);
-                userModel.create(newUser, function (err, done) {});
-                res.send({ "success": "authorized" });
+                userModel.create(newUser, function (err, done) {
+                    res.send({ "success": "authorized" });
+                });
             } else {
                 res.send(authReply);
             }
