@@ -12,9 +12,9 @@ block content
     if (users)
         each user in users
             tr
-                td user.key
-                td user.serverID
-                td user.channelID
+                td= user.key
+                td= user.serverID
+                td= user.channelID
                 td
                     a(href="/update/user.userid") Update
                 td
