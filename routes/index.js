@@ -143,7 +143,7 @@ router.get('/auth', function (req, res, next) {
                     accesstoken: authReply.access_token,
                     refreshtoken: authReply.refresh_token
                 }
-                console.log(newUser);
+                console.log(req.query);
                 userModel.create(newUser, req.query.licenseKey, function (err, done) {
                     res.redirect('/dashboard');
                 });

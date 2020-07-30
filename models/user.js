@@ -75,7 +75,7 @@ exports.getById = function (userid, done) {
 };
 
 exports.get = function (done) {
-    connection.get().query('SELECT * FROM users', function (error, result) {
+    connection.get().query('SELECT * FROM users INNER JOIN licenseKey on users.userid = licenseKey.userid;', function (error, result) {
         if (error) {
             console.log(error);
             return done(error);
