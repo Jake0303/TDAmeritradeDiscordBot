@@ -145,7 +145,7 @@ router.get('/auth', function (req, res, next) {
                 }
                 console.log(newUser);
                 userModel.create(newUser, function (err, done) {
-                    res.send({ "success": "authorized" });
+                    res.redirect('/dashboard');
                 });
             } else {
                 res.send(authReply);
