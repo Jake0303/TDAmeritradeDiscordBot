@@ -81,6 +81,6 @@ exports.get = function (done) {
             console.log(error);
             return done(error, null);
         }
-        return done(null, result);
+        return done(result);
     });
 };

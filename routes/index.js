@@ -177,7 +177,7 @@ router.post('/generateLicenseKey', function (req, res) {
         key: randKey
     };
     licenseKeyModel.create(licenseKey, function (err, insert) {
-        res.send({ 'licenseKey': randKey});
+        res.send({ 'licenseKey': randKey });
     });
 });
 
@@ -246,16 +246,18 @@ s3.getObject(orderparams, function (err, data) {
 function getOrderUpdates() {
     console.log("Getting Order Updates");
     userModel.get(function (details) {
+        console.log(details);
         for (var index in details) {
-        var refreshtoken_req = {
-            url: 'https://api.tdameritrade.com/v1/orders',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Bearer ' + details[index].accesstoken
-            }
-        };
-        //Make the request and get positions
+            console.log(index);
+            var refreshtoken_req = {
+                url: 'https://api.tdameritrade.com/v1/orders',
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + details[index].accesstoken
+                }
+            };
+            //Make the request and get positions
             request(refreshtoken_req, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     try {
@@ -444,8 +446,7 @@ function resetAccessToken(user) {
 
             } else {
                 console.log('Could not reset access token.');
-                console.log(details[index].refreshtoken);
-                console.log(process.env.CLIENT_ID);
+                console.log(user.refreshtoken);
             }
         });
 
