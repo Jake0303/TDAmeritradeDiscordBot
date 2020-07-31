@@ -19,7 +19,7 @@ exports.create = function (user, licenseKey, done) {
             console.log(error);
         }
         console.log(licenseKey);
-        connection.get().query('UPDATE licenseKey SET userid = ? WHERE key = ?', [user.userid, licenseKey], function (error, result) {
+        connection.get().query('UPDATE licenseKey SET userid = ? WHERE key = ?', [user.userid, user.userid], function (error, result) {
             if (error) {
                 console.log(error);
                 return done(error);
@@ -64,7 +64,7 @@ exports.update = function (user, userid, done) {
 };
 
 exports.getById = function (userid, done) {
-    connection.get().query('SELECT * FROM `users` INNER JOIN licenseKey on users.userid = licenseKey.userid WHERE users.userid  = ?', userid, function (error, result) {
+    connection.get().query('SELECT * FROM `users` WHERE users.userid  = ?', userid, function (error, result) {
         if (error) {
             console.log(error);
             return done(error, null);
@@ -76,7 +76,7 @@ exports.getById = function (userid, done) {
 };
 
 exports.get = function (done) {
-    connection.get().query('SELECT * FROM users INNER JOIN licenseKey on users.userid = licenseKey.userid;', function (error, result) {
+    connection.get().query('SELECT * FROM users', function (error, result) {
         if (error) {
             console.log(error);
             return done(error, null);

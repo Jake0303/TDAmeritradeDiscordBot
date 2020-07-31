@@ -1,7 +1,7 @@
 ﻿extends layout
 
 block content
-  h1 Update for License Key : #{user.key}
+  h1 Update for User ID# : #{user.userid}
   hr
   form(method='POST' action='/update/'+user.userid)
     fieldset
