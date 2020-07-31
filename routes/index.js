@@ -94,7 +94,7 @@ Callback endpoint the TDA app uses.
 To understand more about how the API authenticates, see this link.
 https://developer.tdameritrade.com/content/simple-auth-local-apps
 */
-router.get('/auth/:licenseKey', function (req, res, next) {
+router.get('/auth', function (req, res, next) {
     var authRequest = {
         url: 'https://api.tdameritrade.com/v1/oauth2/token',
         method: 'POST',
