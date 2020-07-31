@@ -8,7 +8,7 @@ exports.createSchema = function (done) {
             console.log(error);
             return done(error);
         } else console.log(result);
-        
+
         done(result);
     });
 };
@@ -17,21 +17,21 @@ exports.create = function (user, licenseKey, done) {
     connection.get().query('INSERT INTO `users` SET ?', user, function (error, result) {
         if (error) {
             console.log(error);
-            return done(error);
         }
+        console.log(licenseKey);
         connection.get().query('UPDATE licenseKey SET userid = ? WHERE key = ?', [user.userid, licenseKey], function (error, result) {
             if (error) {
                 console.log(error);
                 return done(error);
             }
 
-            done(null, result.insertId);
+            return done(null, result.insertId);
         });
     });
 };
 
-exports.delete= function (userid, done) {
-    connection.get().query('DELETE FROM `users` WHERE `userid` = ?', userid, function (error, result) {
+exports.delete = function (userid, done) {
+    connection.get().query('DELETE FROM licenseKey WHERE `userid` = ?;DELETE FROM `users` WHERE `userid` = ?', [userid,userid], function (error, result) {
         if (error) {
             console.log(error);
             return done(error);
@@ -64,13 +64,14 @@ exports.update = function (user, userid, done) {
 };
 
 exports.getById = function (userid, done) {
-    connection.get().query('SELECT * FROM `users` WHERE `userid` = ?', userid, function (error, result) {
+    connection.get().query('SELECT * FROM `users` INNER JOIN licenseKey on users.userid = licenseKey.userid WHERE users.userid  = ?', userid, function (error, result) {
         if (error) {
             console.log(error);
-            return done(error, result);
+            return done(error, null);
         }
-
-        done(null, result);
+        if (result && result.length)
+            return done(null, result[0]);
+        else return done(null, null);
     });
 };
 
@@ -78,9 +79,8 @@ exports.get = function (done) {
     connection.get().query('SELECT * FROM users INNER JOIN licenseKey on users.userid = licenseKey.userid;', function (error, result) {
         if (error) {
             console.log(error);
-            return done(error);
+            return done(error, null);
         }
-
-        return done(null,result);
+        return done(null, result);
     });
 };

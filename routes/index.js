@@ -10,7 +10,6 @@ const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com'
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
 require('dotenv').config();
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
 //On Discord Error
@@ -184,7 +183,7 @@ router.post('/generateLicenseKey', function (req, res) {
 
 router.get('/', function (req, res) {
     userModel.get(function (err, users) {
-        res.render('dashboard', users);
+        res.render('dashboard', { users: users });
     });
 });
 
@@ -197,13 +196,13 @@ router.get('/dashboard', function (req, res) {
 
 router.get('/update/:userid', function (req, res) {
     userModel.getById(req.params.userid, function (err, user) {
+        console.log(user);
         res.render('update', { user: user });
     });
 });
 
 router.post('/update/:userid', function (req, res) {
     var user = {
-        key: req.body.key,
         serverID: req.body.serverID,
         channelID: req.body.channelID
     };
