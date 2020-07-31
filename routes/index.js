@@ -245,7 +245,7 @@ s3.getObject(orderparams, function (err, data) {
 //Get open positions
 function getOrderUpdates() {
     console.log("Getting Order Updates");
-    userModel.get(function (details) {
+    userModel.get(function (err, details) {
         console.log(details);
         for (var index in details) {
             console.log(index);
