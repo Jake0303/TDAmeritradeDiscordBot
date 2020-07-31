@@ -10,7 +10,7 @@ const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com'
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
 require('dotenv').config();
-const Discord = require('discord.js');
+/*const Discord = require('discord.js');
 const client = new Discord.Client();
 //On Discord Error
 client.on('error', err => {
@@ -54,7 +54,7 @@ client.on('message', function (message) {
     if (message.content === '/start') {
         message.channel.send('For TMCTD to start tracking your trades go to the following link : https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=https%3A%2F%2Fdiscordbottrades.herokuapp.com%2Fauth&client_id=P3FYOWCFDPAYMPS1UKGR2O0AVOCDRLGA%40AMER.OAUTHAP');
     }
-});
+});*/
 
 //Models
 const licenseKeyModel = require('../models/token');
