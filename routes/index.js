@@ -24,7 +24,7 @@ client.on('ready', () => {
 client.login(process.env.DISCORDTOKEN);
 //Relay messages from Discord and post to them a forum ticker automatically if it contains ($)
 client.on('message', function (message) {
-    if (message.content === '/stop') {
+    /*if (message.content === '/stop') {
         message.channel.send('TMCTD has stopped tracking your trades.');
         // update the details file object
         // TODO : Need to delete credentials associated with Discord account
@@ -53,7 +53,7 @@ client.on('message', function (message) {
     }
     if (message.content === '/start') {
         message.channel.send('For TMCTD to start tracking your trades go to the following link : https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=https%3A%2F%2Fdiscordbottrades.herokuapp.com%2Fauth&client_id=P3FYOWCFDPAYMPS1UKGR2O0AVOCDRLGA%40AMER.OAUTHAP');
-    }
+    }*/
 });
 
 //Models
