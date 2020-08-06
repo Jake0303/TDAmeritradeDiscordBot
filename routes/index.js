@@ -4,11 +4,14 @@ var request = require('request');
 var express = require('express');
 const aws = require('aws-sdk');
 const puppeteer = require('puppeteer');
+const moment = require('moment');
 var router = express.Router();
 var fs = require('fs');
 const redirect_uri = encodeURIComponent('https://discordbottrades.herokuapp.com');
 const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
+var passport = require('passport');
+var bcrypt = require('bcryptjs');
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -24,41 +27,12 @@ client.on('ready', () => {
 client.login(process.env.DISCORDTOKEN);
 //Relay messages from Discord and post to them a forum ticker automatically if it contains ($)
 client.on('message', function (message) {
-    /*if (message.content === '/stop') {
-        message.channel.send('TMCTD has stopped tracking your trades.');
-        // update the details file object
-        // TODO : Need to delete credentials associated with Discord account
-        // right now only deleting latest creds
-        details.pop();
-        const s3 = new aws.S3({
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-            signatureVersion: 'v4',
-            region: 'us-east-2'
-        });
-        // Setting up S3 upload parameters
-        const params = {
-            Bucket: S3_BUCKET,
-            Key: 'details.json', // File name you want to save as in S3
-            Body: JSON.stringify(details, null, 2)
-        };
-
-        // Uploading files to the bucket
-        s3.upload(params, function (err, data) {
-            if (err) {
-                console.log(err);
-            }
-            console.log(`File uploaded successfully. ${data.Location}`);
-        });
-    }
-    if (message.content === '/start') {
-        message.channel.send('For TMCTD to start tracking your trades go to the following link : https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=https%3A%2F%2Fdiscordbottrades.herokuapp.com%2Fauth&client_id=P3FYOWCFDPAYMPS1UKGR2O0AVOCDRLGA%40AMER.OAUTHAP');
-    }*/
-});
+})
 
 //Models
 const licenseKeyModel = require('../models/token');
 const userModel = require('../models/user');
+const adminModel = require('../models/admin');
 //userModel.createSchema(function (err, done) { });
 //licenseKeyModel.createSchema(function (err, done) {});
 //Login Discord Bot
@@ -87,6 +61,52 @@ s3.getObject(params, function (err, data) {
     } catch (err) {
         console.log(err);
     }
+});
+
+
+/*POST for login*/
+//Try to login with passport
+router.post('/login', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureMessage: 'Invalid Login'
+}));
+
+/*Logout*/
+router.get('/logout', function (req, res) {
+    req.session.destroy(function (err) {
+        res.redirect('/');
+    });
+});
+
+/*GET for login*/
+router.get('/login', function (req, res) {
+    res.render('login');
+});
+
+
+/*POST for register*/
+router.post('/register', function (req, res) {
+    //Insert user
+    bcrypt.hash(req.body.password, 10, function (err, hash) {
+        var registerUser = {
+            username: req.body.username,
+            password: hash
+        }
+        //Check if user already exists
+        adminModel.create(registerUser, function (err, user) {
+            req.login(registerUser, function (err) {
+                console.log('Trying to login');
+                if (err) console.log(err);
+                return res.redirect('/');
+            });
+        });
+    })
+});
+
+/*GET for register*/
+router.get('/register', function (req, res) {
+    res.render('register');
 });
 
 /* 
@@ -140,7 +160,8 @@ router.get('/auth', function (req, res, next) {
                 });*/
                 var newUser = {
                     accesstoken: authReply.access_token,
-                    refreshtoken: authReply.refresh_token
+                    refreshtoken: authReply.refresh_token,
+                    accesslastupdate: moment()
                 }
                 console.log(req.params);
                 userModel.create(newUser, authReply.access_token, function (err, done) {
@@ -182,22 +203,30 @@ router.post('/generateLicenseKey', function (req, res) {
 });
 
 router.get('/', function (req, res) {
+    if (req.isAuthenticated()) {
     userModel.get(function (err, users) {
-        res.render('dashboard', { users: users });
-    });
+        res.render('dashboard', { users: users, user:req.user });
+        });
+    } else {
+        res.redirect('/login');
+    }
 });
 
 router.get('/dashboard', function (req, res) {
-    userModel.get(function (err, users) {
-        console.log(users);
-        res.render('dashboard', { users: users });
-    });
+    if (req.isAuthenticated()) {
+        userModel.get(function (err, users) {
+            console.log(users);
+            res.render('dashboard', { users: users, user: req.user });
+        });
+    } else {
+        res.redirect('/login');
+    }
 });
 
 router.get('/update/:userid', function (req, res) {
     userModel.getById(req.params.userid, function (err, user) {
         console.log(user);
-        res.render('update', { user: user });
+        res.render('update', { user: user, user: req.user });
     });
 });
 
@@ -246,9 +275,7 @@ s3.getObject(orderparams, function (err, data) {
 function getOrderUpdates() {
     console.log("Getting Order Updates");
     userModel.get(function (err, details) {
-        console.log(details);
         for (var index in details) {
-            console.log(index);
             var refreshtoken_req = {
                 url: 'https://api.tdameritrade.com/v1/orders',
                 method: 'GET',
@@ -285,17 +312,12 @@ function getOrderUpdates() {
                                             if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
                                                 messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @ " + orders[i].price;
                                             else {
-                                                console.log(orders[i].orderLegCollection[0]);
                                                 messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.description + " @ " + orders[i].price;
                                             }
                                         }
-                                        if (!lastOrderId.includes(index.toString() + messageToDisplay + orders[i].enteredTime.toString() + orders[i].orderId.toString())) {
-                                            //if (index == 0)
+                                        if (!lastOrderId.includes(index.toString() + messageToDisplay + orders[i].enteredTime.toString() + orders[i].orderId.toString())
+                                            && moment(orders[i].enteredTime).isAfter(moment(details[index].accesslastupdate))) {
                                             client.channels.cache.get(details[index].channelID).send(messageToDisplay);
-                                            //else if (index == 1)
-                                            //  client.channels.cache.get('730906624226623531').send(messageToDisplay);
-                                            //else
-                                            //  client.channels.cache.get('730906609982898270').send(messageToDisplay);
                                             lastOrderId.push(index.toString() + messageToDisplay + orders[i].enteredTime.toString() + orders[i].orderId.toString());
                                             const s3 = new aws.S3({
                                                 accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -398,6 +420,7 @@ async function resetTokens() {
 
 function resetAccessToken(user) {
     try {
+        console.log(user.refreshtoken);
         var refreshtoken_req = {
             url: 'https://api.tdameritrade.com/v1/oauth2/token',
             method: 'POST',
@@ -405,8 +428,8 @@ function resetAccessToken(user) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             form: {
-                'grant_type': 'refreshtoken',
-                'refreshtoken': user.refreshtoken,
+                'grant_type': 'refresh_token',
+                'refresh_token': user.refreshtoken,
                 'client_id': process.env.CLIENT_ID
             }
         };

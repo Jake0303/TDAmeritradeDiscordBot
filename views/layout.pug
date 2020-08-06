@@ -5,8 +5,14 @@ html
     link(rel='stylesheet', href='/stylesheets/main.css')
   body
     nav
-      a(href='/dashboard') Dashboard
-      |  | 
-      a(href='/licenseKey') Generate License Key
-      |  
+      if (user)
+        a(href='/dashboard') Dashboard
+        |  | 
+        a(href='/licenseKey') Generate License Key
+        |  
+      else
+        a(href='/login') Login 
+        | | 
+        a(href='/register') Register
+        | | 
     block content

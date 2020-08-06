@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Include="connection.js" />
     <Compile Include="app.js" />
+    <Compile Include="models\admin.js" />
     <Compile Include="models\user.js" />
     <Compile Include="models\token.js">
       <SubType>Code</SubType>
@@ -48,6 +49,8 @@
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
+    <Content Include="views\register.pug" />
+    <Content Include="views\login.pug" />
     <Content Include="views\update.pug" />
     <Content Include="views\dashboard.pug" />
     <Content Include="views\createLicenseKey.pug" />

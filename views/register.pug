@@ -1,0 +1,12 @@
+﻿extends layout
+
+block content
+  h1 Register Page
+  form(method='POST' action='/register')
+    fieldset
+        label(for='username') Username
+        input#username(type='text' name='username')
+    fieldset
+        label(for='password') Password
+        input#password(type='password' name='password')
+    input(type='submit' value='Register')
