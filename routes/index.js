@@ -223,6 +223,13 @@ router.get('/dashboard', function (req, res) {
     }
 });
 
+router.get('/update/:userid', function (req, res) {
+    userModel.getById(req.params.userid, function (err, user) {
+        console.log(user);
+        res.render('update', { user: user, user: req.user });
+    });
+});
+
 router.post('/update/:userid', function (req, res) {
     var user = {
         serverID: req.body.serverID,
