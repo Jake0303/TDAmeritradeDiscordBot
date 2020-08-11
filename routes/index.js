@@ -235,6 +235,7 @@ router.post('/update/:userid', function (req, res) {
         serverID: req.body.serverID,
         channelID: req.body.channelID
     };
+    console.log(user);
     userModel.update(user, req.params.userid, function (err, done) {
         res.redirect('/dashboard');
     });

@@ -58,7 +58,6 @@ exports.update = function (user, userid, done) {
             console.log(error);
             return done(error);
         }
-
         done(null, result);
     });
 };
