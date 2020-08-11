@@ -226,7 +226,7 @@ router.get('/dashboard', function (req, res) {
 router.get('/update/:userid', function (req, res) {
     userModel.getById(req.params.userid, function (err, user) {
         console.log(user);
-        res.render('update', { user: user, user: req.user });
+        res.render('update', { user: user});
     });
 });
 
