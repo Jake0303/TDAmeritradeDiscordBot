@@ -104,11 +104,6 @@ router.post('/register', function (req, res) {
     })
 });
 
-/*GET for register*/
-router.get('/register', function (req, res) {
-    res.render('register');
-});
-
 /* 
 Callback endpoint the TDA app uses.
 To understand more about how the API authenticates, see this link.

@@ -51,6 +51,7 @@
     <Content Include="README.md" />
     <Content Include="views\register.pug" />
     <Content Include="views\login.pug" />
+    <Content Include="views\success.pug" />
     <Content Include="views\update.pug" />
     <Content Include="views\dashboard.pug" />
     <Content Include="views\createLicenseKey.pug" />
