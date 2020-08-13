@@ -168,7 +168,7 @@ router.get('/auth', function (req, res, next) {
                     if (req.user)
                         res.redirect('/dashboard');
                     else
-                        res.render('success');
+                        res.redirect('/success');
                 });
             } else {
                 res.send(authReply);
@@ -181,6 +181,10 @@ router.get('/auth', function (req, res, next) {
 
 });
 
+
+router.get('/success', function (req, res) {
+    res.render('success');
+});
 
 router.get('/licenseKey', function (req, res) {
     res.render('createLicenseKey');
