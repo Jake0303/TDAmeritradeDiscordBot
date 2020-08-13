@@ -165,7 +165,10 @@ router.get('/auth', function (req, res, next) {
                 }
                 console.log(req.params);
                 userModel.create(newUser, authReply.access_token, function (err, done) {
-                    res.redirect('/dashboard');
+                    if (req.user)
+                        res.redirect('/dashboard');
+                    else
+                        res.render('success');
                 });
             } else {
                 res.send(authReply);
@@ -204,8 +207,8 @@ router.post('/generateLicenseKey', function (req, res) {
 
 router.get('/', function (req, res) {
     if (req.isAuthenticated()) {
-    userModel.get(function (err, users) {
-        res.render('dashboard', { users: users, user:req.user });
+        userModel.get(function (err, users) {
+            res.render('dashboard', { users: users, user: req.user });
         });
     } else {
         res.redirect('/login');
@@ -225,8 +228,7 @@ router.get('/dashboard', function (req, res) {
 
 router.get('/update/:userid', function (req, res) {
     userModel.getById(req.params.userid, function (err, user) {
-        console.log(user);
-        res.render('update', { user: user});
+        res.render('update', { user: user });
     });
 });
 
