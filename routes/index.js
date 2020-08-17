@@ -313,10 +313,10 @@ function getOrderUpdates() {
                                                 messageToDisplay = "(OPTIONS) " + order.orderLegCollection[0].instruction + " -" + order.filledQuantity + " " + order.orderLegCollection[0].instrument.description + " @ " + order.price;
                                             }
                                         }
-                                        if (!lastOrderId.includes(index.toString() + messageToDisplay + order.enteredTime.toString() + order.orderId.toString())
+                                        if (!lastOrderId.includes(messageToDisplay + order.orderId.toString())
                                             && moment(order.enteredTime).isAfter(moment(user.accesslastupdate))) {
                                             client.channels.cache.get(user.channelID).send(messageToDisplay);
-                                            lastOrderId.push(index.toString() + messageToDisplay + order.enteredTime.toString() + order.orderId.toString());
+                                            lastOrderId.push(messageToDisplay + order.orderId.toString());
                                             const s3 = new aws.S3({
                                                 accessKeyId: process.env.AWS_ACCESS_KEY_ID,
                                                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -364,7 +364,7 @@ function getOrderUpdates() {
         });
     });
 }
-setInterval(getOrderUpdates, 15000);
+setInterval(getOrderUpdates, 13000);
 
 
 function resetAccessToken(user) {
