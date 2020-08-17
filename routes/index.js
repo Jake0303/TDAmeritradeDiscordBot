@@ -15,6 +15,7 @@ var bcrypt = require('bcryptjs');
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
+var async = require('async');
 //On Discord Error
 client.on('error', err => {
     console.log(err);
@@ -248,13 +249,6 @@ router.post('/delete/:userid', function (req, res) {
     });
 });
 
-router.get('/reset', async function (req, res, next) {
-    try {
-        var result = await resetTokens();
-    } catch (err) {
-        console.log(err);
-    }
-});
 
 var lastOrderId = [];
 // Setting up S3 upload parameters
@@ -277,13 +271,14 @@ s3.getObject(orderparams, function (err, data) {
 function getOrderUpdates() {
     console.log("Getting Order Updates");
     userModel.get(function (err, details) {
-        for (var index in details) {
+        async.forEachOfSeries(details, function (user, index, inner_callback) {
+
             var refreshtoken_req = {
                 url: 'https://api.tdameritrade.com/v1/orders',
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer ' + details[index].accesstoken
+                    'Authorization': 'Bearer ' + user.accesstoken
                 }
             };
             //Make the request and get positions
@@ -292,35 +287,36 @@ function getOrderUpdates() {
                     try {
                         var orders = JSON.parse(body);
                         if (orders.length) {
-                            for (var i = 0; i < orders.length; i++) {
+                            async.forEachOfSeries(orders, function (order, index, inner_callback1) {
+
                                 try {
                                     var messageToDisplay = ''
-                                    if (orders[i].status == 'FILLED') {
-                                        if (orders[i].price == null || orders[i].price == undefined || orders[i].price == 'undefined')
-                                            orders[i].price = 'MARKET';
-                                        if (orders[i].orderLegCollection[0].instruction == 'BUY'
-                                            || (orders[i].orderLegCollection != null && orders[i].orderLegCollection.length > 0 && orders[i].orderLegCollection[0].positionEffect == 'OPENING')) {
-                                            orders[i].orderLegCollection[0].instruction = 'BOT';
-                                            if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
-                                                messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @ " + orders[i].price;
+                                    if (order.status == 'FILLED') {
+                                        if (order.price == null || order.price == undefined || order.price == 'undefined')
+                                            order.price = 'MARKET';
+                                        if (order.orderLegCollection[0].instruction == 'BUY'
+                                            || (order.orderLegCollection != null && order.orderLegCollection.length > 0 && order.orderLegCollection[0].positionEffect == 'OPENING')) {
+                                            order.orderLegCollection[0].instruction = 'BOT';
+                                            if (order.orderLegCollection[0].orderLegType == 'EQUITY')
+                                                messageToDisplay = "(SHARES) " + order.orderLegCollection[0].instruction + " +" + order.filledQuantity + " " + order.orderLegCollection[0].instrument.symbol + " @ " + order.price;
                                             else {
-                                                console.log(orders[i].orderLegCollection[0].instrument);
-                                                messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " +" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.description + " @ " + orders[i].price;
+                                                console.log(order.orderLegCollection[0].instrument);
+                                                messageToDisplay = "(OPTIONS) " + order.orderLegCollection[0].instruction + " +" + order.filledQuantity + " " + order.orderLegCollection[0].instrument.description + " @ " + order.price;
 
                                             }
                                         }
                                         else {
-                                            orders[i].orderLegCollection[0].instruction = 'SOLD';
-                                            if (orders[i].orderLegCollection[0].orderLegType == 'EQUITY')
-                                                messageToDisplay = "(SHARES) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.symbol + " @ " + orders[i].price;
+                                            order.orderLegCollection[0].instruction = 'SOLD';
+                                            if (order.orderLegCollection[0].orderLegType == 'EQUITY')
+                                                messageToDisplay = "(SHARES) " + order.orderLegCollection[0].instruction + " -" + order.filledQuantity + " " + order.orderLegCollection[0].instrument.symbol + " @ " + order.price;
                                             else {
-                                                messageToDisplay = "(OPTIONS) " + orders[i].orderLegCollection[0].instruction + " -" + orders[i].filledQuantity + " " + orders[i].orderLegCollection[0].instrument.description + " @ " + orders[i].price;
+                                                messageToDisplay = "(OPTIONS) " + order.orderLegCollection[0].instruction + " -" + order.filledQuantity + " " + order.orderLegCollection[0].instrument.description + " @ " + order.price;
                                             }
                                         }
-                                        if (!lastOrderId.includes(index.toString() + messageToDisplay + orders[i].enteredTime.toString() + orders[i].orderId.toString())
-                                            && moment(orders[i].enteredTime).isAfter(moment(details[index].accesslastupdate))) {
-                                            client.channels.cache.get(details[index].channelID).send(messageToDisplay);
-                                            lastOrderId.push(index.toString() + messageToDisplay + orders[i].enteredTime.toString() + orders[i].orderId.toString());
+                                        if (!lastOrderId.includes(index.toString() + messageToDisplay + order.enteredTime.toString() + order.orderId.toString())
+                                            && moment(order.enteredTime).isAfter(moment(user.accesslastupdate))) {
+                                            client.channels.cache.get(user.channelID).send(messageToDisplay);
+                                            lastOrderId.push(index.toString() + messageToDisplay + order.enteredTime.toString() + order.orderId.toString());
                                             const s3 = new aws.S3({
                                                 accessKeyId: process.env.AWS_ACCESS_KEY_ID,
                                                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -341,83 +337,34 @@ function getOrderUpdates() {
                                                 }
                                                 console.log(`File uploaded successfully. ${data.Location}`);
                                             });
-                                        }
-                                    }
+                                            inner_callback1(null);
+                                        } else inner_callback1(null);
+                                    } else inner_callback1(null);
 
                                 } catch (err) {
                                     console.log(err);
+                                    inner_callback1(null);
                                 }
-                            }
+                            }, function (err) {
+                                inner_callback(null);
+                            });
                         }
 
                     } catch (err) {
                         console.log(err);
+                        resetAccessToken(user);
                     }
                 } else {
                     console.log(JSON.parse(body));
-                    resetAccessToken(details[index]);
+                    resetAccessToken(user);
                 }
             });
-        }
+        }, function (err) {
+
+        });
     });
 }
 setInterval(getOrderUpdates, 15000);
-
-/*
-Automatically fill in the login form to authenticate the TDA app
-*/
-async function resetTokens() {
-    console.log('here');
-    // Launch the browser
-    const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
-    });
-    const page = await browser.newPage();
-
-    // Go to the authentication page
-    await page.goto('https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=' + encodeURIComponent(+'+https://discordbottrades.herokuapp.com/auth') + '&client_id=' + process.env.CLIENT_ID + '%40AMER.OAUTHAP');
-
-    // Enter username
-    await page.click('#username');
-    await page.keyboard.type(process.env.USER); // your trading account username
-
-    // Enter password
-    await page.click('#password');
-    await page.keyboard.type(process.env.PASS); // your trading account password
-    await page.click('#rememberuserid');
-    // Click login button
-    await page.click('#accept');
-    console.log('here');
-    // Click allow button
-    await page.click('#accept');
-
-    // get the tokens from the pre element
-    var elem = await page.$("pre");
-    var text = await page.evaluate(elem => elem.textContent, elem);
-
-    // parse the response to a new object
-    var jsonText = JSON.parse(text);
-    console.log(jsonText);
-
-    // update the details file object
-    details.accesstoken = jsonText.accesstoken;
-    details.refreshtoken = jsonText.refreshtoken;
-    let time = Date().toString();
-    details.access_last_update = time;
-    details.refresh_last_update = time;
-
-    // write the updated object to the details.json file
-    fs.writeFile(detailsFileName, JSON.stringify(details, null, 2), function (err) {
-        if (err) console.error(err);
-    });
-
-    // Close browser
-    await browser.close();
-
-    // return the text
-    return text;
-
-}
 
 
 function resetAccessToken(user) {
@@ -432,6 +379,7 @@ function resetAccessToken(user) {
             form: {
                 'grant_type': 'refresh_token',
                 'refresh_token': user.refreshtoken,
+                'access_type': offline,
                 'client_id': process.env.CLIENT_ID
             }
         };
@@ -501,10 +449,7 @@ function compareTimeDifference(t1, t2, maxDifference) {
 function validateTokens() {
     let time = Date().toString();
     // if the refresh token is expired, then reset both tokens
-    if (compareTimeDifference(details.refresh_last_update, time, Days90)) {
-        resetTokens();
-        // if the access token is expired, then reset it
-    } else if (compareTimeDifference(details.access_last_update, time, Minutes30)) {
+    if (compareTimeDifference(details.access_last_update, time, Minutes30)) {
         resetAccessToken();
     }
 }
