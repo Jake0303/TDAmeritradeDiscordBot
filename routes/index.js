@@ -379,7 +379,7 @@ function resetAccessToken(user) {
             form: {
                 'grant_type': 'refresh_token',
                 'refresh_token': user.refreshtoken,
-                'access_type': offline,
+                'access_type': 'offline',
                 'client_id': process.env.CLIENT_ID
             }
         };
