@@ -390,8 +390,8 @@ function resetAccessToken(user) {
                 // get the TDA response
                 var authReply = JSON.parse(body);
                 //TODO : Successfully resets access token but next call for order updates does not work with new token even though it was granted
-                console.log(authReply.accesstoken);
-                user.accesstoken = authReply.accesstoken;
+                console.log(authReply);
+                user.accesstoken = authReply.access_token;
                 user.accesslastupdate = Date().toString();
 
                 const s3 = new aws.S3({
