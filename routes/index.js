@@ -352,7 +352,6 @@ function getOrderUpdates() {
 
                     } catch (err) {
                         console.log(err);
-                        resetAccessToken(user);
                     }
                 } else {
                     console.log(JSON.parse(body));
@@ -379,7 +378,7 @@ function resetAccessToken(user) {
             form: {
                 'grant_type': 'refresh_token',
                 'refresh_token': user.refreshtoken,
-                'access_type': 'offline',
+                'access_type': '',
                 'client_id': process.env.CLIENT_ID
             }
         };
