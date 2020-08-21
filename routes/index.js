@@ -97,7 +97,6 @@ router.post('/register', function (req, res) {
         //Check if user already exists
         adminModel.create(registerUser, function (err, user) {
             req.login(registerUser, function (err) {
-                console.log('Trying to login');
                 if (err) console.log(err);
                 return res.redirect('/');
             });
@@ -132,34 +131,11 @@ router.get('/auth', function (req, res, next) {
             // parse the tokens
             var authReply = JSON.parse(body);
             if (!error && response.statusCode == 200) {
-                /* update the details file object
-                details.push({ accesstoken: authReply.accesstoken, refreshtoken: authReply.refreshtoken });
-                const s3 = new aws.S3({
-                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-                    signatureVersion: 'v4',
-                    region: 'us-east-2'
-                });
-                // Setting up S3 upload parameters
-                const params = {
-                    Bucket: S3_BUCKET,
-                    Key: 'details.json', // File name you want to save as in S3
-                    Body: JSON.stringify(details, null, 2)
-                };
-
-                // Uploading files to the bucket
-                s3.upload(params, function (err, data) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    console.log(`File uploaded successfully. ${data.Location}`);
-                });*/
                 var newUser = {
                     accesstoken: authReply.access_token,
                     refreshtoken: authReply.refresh_token,
                     accesslastupdate: moment()
                 }
-                console.log(req.params);
                 userModel.create(newUser, authReply.access_token, function (err, done) {
                     if (req.user)
                         res.redirect('/dashboard');
@@ -269,10 +245,8 @@ s3.getObject(orderparams, function (err, data) {
 });
 //Get open positions
 function getOrderUpdates() {
-    console.log("Getting Order Updates");
     userModel.get(function (err, details) {
         async.forEachOfSeries(details, function (user, index, inner_callback) {
-
             var refreshtoken_req = {
                 url: 'https://api.tdameritrade.com/v1/orders',
                 method: 'GET',
@@ -335,23 +309,23 @@ function getOrderUpdates() {
                                                 if (err) {
                                                     console.log(err);
                                                 }
-                                                console.log(`File uploaded successfully. ${data.Location}`);
                                             });
                                             inner_callback1(null);
                                         } else inner_callback1(null);
                                     } else inner_callback1(null);
 
                                 } catch (err) {
-                                    console.log(err);
+                                    if (err) console.log(err);
                                     inner_callback1(null);
                                 }
                             }, function (err) {
+                                if (err) console.log(err);
                                 inner_callback(null);
                             });
                         }
 
                     } catch (err) {
-                        console.log(err);
+                        if (err) console.log(err);
                     }
                 } else {
                     console.log(JSON.parse(body));
@@ -368,7 +342,6 @@ setInterval(getOrderUpdates, 13000);
 
 function resetAccessToken(user) {
     try {
-        console.log(user.refreshtoken);
         var refreshtoken_req = {
             url: 'https://api.tdameritrade.com/v1/oauth2/token',
             method: 'POST',
@@ -389,7 +362,6 @@ function resetAccessToken(user) {
                 // get the TDA response
                 var authReply = JSON.parse(body);
                 //TODO : Successfully resets access token but next call for order updates does not work with new token even though it was granted
-                console.log(authReply);
                 user.accesstoken = authReply.access_token;
                 user.accesslastupdate = Date().toString();
 
