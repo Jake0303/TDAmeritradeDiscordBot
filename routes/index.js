@@ -328,7 +328,7 @@ function getOrderUpdates() {
                         if (err) console.log(err);
                     }
                 } else {
-                    console.log(JSON.parse(body));
+                    console.log((body));
                     resetAccessToken(user);
                 }
             });
