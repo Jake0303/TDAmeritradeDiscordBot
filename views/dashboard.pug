@@ -16,7 +16,7 @@ block content
                 td= user.key
                 td= user.serverID
                 td= user.channelID
-                if (!user.authStatus || user.authStatus = "Authorized")
+                if (!user.authStatus || user.authStatus == "Authorized")
                     td(style="color:green") Authorized
                 else
                     td(style="color:red") Not Authorized
