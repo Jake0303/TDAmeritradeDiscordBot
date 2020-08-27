@@ -7,6 +7,7 @@ block content
     th License Key
     th Server ID
     th Channel ID
+    th Status
     th Update
     th Delete
     if (users)
@@ -15,6 +16,10 @@ block content
                 td= user.key
                 td= user.serverID
                 td= user.channelID
+                if (!user.authStatus || user.authStatus = "Authorized")
+                    td(style="color:green") Authorized
+                else
+                    td(style="color:red") Not Authorized
                 td
                     a(href="/update/"+user.userid) Update
                 td

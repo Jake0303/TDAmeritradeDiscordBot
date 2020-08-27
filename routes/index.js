@@ -385,6 +385,7 @@ function resetAccessToken(user) {
                         console.log(err);
                     }
                 });
+                user.authStatus = "Authorized";
                 userModel.update(user, user.userid, function (err, done) {
 
                 });
@@ -394,6 +395,10 @@ function resetAccessToken(user) {
                 console.log(body);
                 console.log("Client ID : " + process.env.CLIENT_ID);
                 console.log("User ID : " + user.userid);
+                user.authStatus = "Not Authorized";
+                userModel.update(user, user.userid, function (err, done) {
+
+                });
             }
         });
 
