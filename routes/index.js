@@ -330,6 +330,7 @@ function getOrderUpdates() {
                 } else {
                     console.log((body));
                     resetAccessToken(user);
+                    inner_callback(null);
                 }
             });
         }, function (err) {
@@ -390,7 +391,7 @@ function resetAccessToken(user) {
 
             } else {
                 console.log('Could not reset access token.');
-                console.log(user.refreshtoken);
+                console.log(body);
             }
         });
 
