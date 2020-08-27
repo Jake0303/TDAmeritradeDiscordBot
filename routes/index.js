@@ -322,10 +322,10 @@ function getOrderUpdates() {
                                 if (err) console.log(err);
                                 inner_callback(null);
                             });
-                        }
-
+                        } else inner_callback(null);
                     } catch (err) {
                         if (err) console.log(err);
+                        inner_callback(null);
                     }
                 } else {
                     console.log((body));
