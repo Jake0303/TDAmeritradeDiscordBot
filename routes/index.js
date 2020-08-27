@@ -392,6 +392,8 @@ function resetAccessToken(user) {
             } else {
                 console.log('Could not reset access token.');
                 console.log(body);
+                console.log("Client ID : " + process.env.CLIENT_ID);
+                console.log("User ID : " + user.userid);
             }
         });
 
