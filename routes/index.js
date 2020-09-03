@@ -38,7 +38,8 @@ client.on('message', function (message) {
         || message.content.includes('(SHARES) SELL')
         || message.content.includes('(OPTIONS) BUY')
         || message.content.includes('(OPTIONS) SELL')) {
-        message.channel.send(message.content);
+        if (!message.author.bot)
+            message.channel.send(message.content);
     }
 })
 
