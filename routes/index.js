@@ -35,9 +35,9 @@ client.on('message', function (message) {
         message.channel.send("Stocks Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 CAll @ 0.02");
     }
     if (message.content.includes('(SHARES) BUY')
-        || message.includes('(SHARES) SELL')
-        || message.includes('(OPTIONS) BUY')
-        || message.includes('(OPTIONS) SELL')) {
+        || message.content.includes('(SHARES) SELL')
+        || message.content.includes('(OPTIONS) BUY')
+        || message.content.includes('(OPTIONS) SELL')) {
         message.channel.send(message.content);
     }
 })
