@@ -28,6 +28,18 @@ client.on('ready', () => {
 client.login(process.env.DISCORDTOKEN);
 //Relay messages from Discord and post to them a forum ticker automatically if it contains ($)
 client.on('message', function (message) {
+    if (message.content === 'bothelp') {
+        message.channel.send("Bot message format for Stocks : (SHARES) BUY/SELL +QUANTITY/-QUANTITY SYMBOL @ PRICE/MKT");
+        message.channel.send("Stocks Example : (SHARES) BUY +1 GT @ 9.55");
+        message.channel.send("Bot message format for Options : (OPTIONS) BUY/SELL +QUANTITY/-QUANTITY SYMBOL MONTH DAY YEAR STRIKE Call/Put @ PRICE/MKT");
+        message.channel.send("Stocks Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 CAll @ 0.02");
+    }
+    if (message.includes('(SHARES) BUY')
+        || message.includes('(SHARES) SELL')
+        || message.includes('(OPTIONS) BUY')
+        || message.includes('(OPTIONS) SELL')) {
+        message.channel.send(message.content);
+    }
 })
 
 //Models
