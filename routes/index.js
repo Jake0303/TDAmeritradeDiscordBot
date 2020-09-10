@@ -39,7 +39,7 @@ client.on('message', function (message) {
         || message.content.includes('(OPTIONS) BUY')
         || message.content.includes('(OPTIONS) SELL')) {
         if (!message.author.bot) {
-            message.channel.send(message.content);
+            //message.channel.send(message.content);
             var split = message.content.split(' ');
             var type = split[0].toUpperCase();
             var side = split[1].toUpperCase();
@@ -155,9 +155,9 @@ client.on('message', function (message) {
                 json: true,
                 body: orderObject
             };
-            request(placeorder_req, function (error, response, body) {
+            /*request(placeorder_req, function (error, response, body) {
                 console.log(body);
-            });
+            });*/
         }
     }
 })
