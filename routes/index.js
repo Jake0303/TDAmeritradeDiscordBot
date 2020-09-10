@@ -117,7 +117,7 @@ client.on('message', function (message) {
                             "instruction": "BUY_TO_OPEN",
                             "quantity": quantity,
                             "instrument": {
-                                "symbol": symbol+"_"+,
+                                "symbol": symbol,
                                 "assetType": "OPTION"
                             }
                         }
