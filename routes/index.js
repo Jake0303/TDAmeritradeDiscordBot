@@ -76,7 +76,7 @@ client.on('message', function (message) {
                     "orderStrategyType": "SINGLE",
                     "orderLegCollection": [
                         {
-                            "instruction": "Buy",
+                            "instruction": side,
                             "quantity": quantity,
                             "instrument": {
                                 "symbol": symbol,
@@ -94,7 +94,7 @@ client.on('message', function (message) {
                     "orderStrategyType": "SINGLE",
                     "orderLegCollection": [
                         {
-                            "instruction": "Buy",
+                            "instruction": side,
                             "quantity": quantity,
                             "instrument": {
                                 "symbol": symbol,
@@ -114,7 +114,7 @@ client.on('message', function (message) {
                     "orderStrategyType": "SINGLE",
                     "orderLegCollection": [
                         {
-                            "instruction": "BUY_TO_OPEN",
+                            "instruction": side+"_TO_OPEN",
                             "quantity": quantity,
                             "instrument": {
                                 "symbol": symbol,
@@ -133,7 +133,7 @@ client.on('message', function (message) {
                     "orderStrategyType": "SINGLE",
                     "orderLegCollection": [
                         {
-                            "instruction": "BUY_TO_OPEN",
+                            "instruction": side+"_TO_OPEN",
                             "quantity": quantity,
                             "instrument": {
                                 "symbol": symbol,
