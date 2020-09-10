@@ -150,7 +150,6 @@ client.on('message', function (message) {
                 url: 'https://api.tdameritrade.com/v1/accounts/492426227/orders',
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': 'Bearer 5AuRXr8LmR0DjB7cs0fmv+GzCKb3s4Qa50tFUthZw8AO72GfQBLn1Lnh4MfaP7dx+w0xI59uyGi3d2rsbp7jqstUaXPvpmu9cQOx4UE8xt7Kgje53Zd1fSaZW95DbryzMB4PA4i2zmSZ40Z41NtHDqJ0k0qoLEbXwCM87Ge8DWq1kvOUTJXRMSOzZfeOVKD3t7ejulbm/LhL2mpwg9h2YnshwjUvG5oVXc+xfeIF6N0l2gEZ1AW/gCjkmaIYP6wsc0H9WVOpQiRBCWF8cSd2U5lXJfSTmtbZI8Cuho2Q5KFOuJe5QuJFGL5QYAAAMCwux4DRG8YrpXj6L2tMcQoTsZGT3+Bto+nzNIAHVMYByuYCaAJZPx2TtRHLY1i9wdEH0RdF9RKbs5qgl8X6S9PHzkU/dY93k0GqX2PBEAqTadimNxQyZUpO90ukEtTUdaXpSqMR+PAJXwG0JZXsu+HAgxXiEqRhD2rm4mxvpfljlukkfob6uM0VQBMOClfxnBBM41L+q+sRhE9EwtzshsRmskCKa9h10SLDugl0eABmDzWJ0iqS6100MQuG4LYrgoVi/JHHvl9e3BZ1RDopPCvydiul4DjYmqcsBGLhuvdrmlqo59Vium+2AyKt/Vt/F5igu9nhPkJlNaR04o0ZYWHBp9tVGUuH81aRjd4IotrtFOsBUjEKLGwr67VchZUU7wgAJvmSs+KesMBh353AsyQ2sDP44Ux7tG0aTypKOVIBQy3kHdO5Qm01/lE6nTrF5eqIJjuzOUVfElNJkLdkCmbGDVV3zWn7T5MWrc9Yb7YlPr2wzdJWNGDz7mHHfstjrYwPss9SwnJETujb+bUoLUeEJYB/HWKrU7KXElFtr0qov5rtLXRf3k+cju1OeSKotxUfR9nuaN4IrTqI4pjg7kAFwBUSvrt3S/OyAPIGvegjSBROxCVmmq/pdam+9S7+F33LtFV+hUcGlvgfHf4hmyPVONsEiXY5+mV6JpX4MZ2060ZCHv1WRx3MdS15JTm7A0Dbx51TiriGNLzf9GQWFAy6RHL1HdP8GuDo7hcKDCeN14lZGEma0bfa4HM+73L31Yf8jdBRi2p/UmGzavsZvodjXr5pG6mAvhMPrZgCf7SwyXLDl0BYzZkaqA==212FD3x19z9sWBHDJACbC00B75E'
                 },
                 json: true,
