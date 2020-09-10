@@ -32,14 +32,134 @@ client.on('message', function (message) {
         message.channel.send("Bot message format for Stocks : (SHARES) BUY/SELL +QUANTITY/-QUANTITY SYMBOL @ PRICE/MKT");
         message.channel.send("Stocks Example : (SHARES) BUY +1 GT @ 9.55");
         message.channel.send("Bot message format for Options : (OPTIONS) BUY/SELL +QUANTITY/-QUANTITY SYMBOL MONTH DAY YEAR STRIKE Call/Put @ PRICE/MKT");
-        message.channel.send("Stocks Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 CAll @ 0.02");
+        message.channel.send("Stocks Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 Call @ 0.02");
     }
     if (message.content.includes('(SHARES) BUY')
         || message.content.includes('(SHARES) SELL')
         || message.content.includes('(OPTIONS) BUY')
         || message.content.includes('(OPTIONS) SELL')) {
-        if (!message.author.bot)
+        if (!message.author.bot) {
             message.channel.send(message.content);
+            var split = message.content.split(' ');
+            var type = split[0];
+            var side = split[1];
+            var quantity = split[2];
+            var symbol = split[3];
+            var price = 0;
+            var month = 0;
+            var day = 0;
+            var year = 0
+            var strike = 0;
+            var callput = 0;
+            var price = 0;
+            //Stock
+            if (type == "(SHARES)") {
+                price = split[5];
+            }
+            //Options
+            else {
+                month = split[4];
+                day = split[5];
+                year = split[6];
+                strike = split[7];
+                callput = split[8];
+                price = split[9];
+            }
+            console.log(split);
+
+            var orderObject = {};
+            if (price == "MKT" && type == "(SHARES)") {
+                orderObject = {
+                    "orderType": "MARKET",
+                    "session": "NORMAL",
+                    "duration": "DAY",
+                    "orderStrategyType": "SINGLE",
+                    "orderLegCollection": [
+                        {
+                            "instruction": "Buy",
+                            "quantity": quantity,
+                            "instrument": {
+                                "symbol": symbol,
+                                "assetType": "EQUITY"
+                            }
+                        }
+                    ]
+                }
+            } else if (price != "MKT" && type == "(SHARES)") {
+                orderObject = {
+                    "orderType": "LIMIT",
+                    "session": "NORMAL",
+                    "price": price,
+                    "duration": "DAY",
+                    "orderStrategyType": "SINGLE",
+                    "orderLegCollection": [
+                        {
+                            "instruction": "Buy",
+                            "quantity": quantity,
+                            "instrument": {
+                                "symbol": symbol,
+                                "assetType": "EQUITY"
+                            }
+                        }
+                    ]
+                }
+            }
+            if (price != "MKT" && type == "(OPTIONS)") {
+                orderObject = {
+                    "complexOrderStrategyType": "NONE",
+                    "orderType": "LIMIT",
+                    "session": "NORMAL",
+                    "price": price,
+                    "duration": "DAY",
+                    "orderStrategyType": "SINGLE",
+                    "orderLegCollection": [
+                        {
+                            "instruction": "BUY_TO_OPEN",
+                            "quantity": quantity,
+                            "instrument": {
+                                "symbol": symbol+"_"+,
+                                "assetType": "OPTION"
+                            }
+                        }
+                    ]
+                }
+            }
+            if (price == "MKT" && type == "(OPTIONS)") {
+                orderObject = {
+                    "complexOrderStrategyType": "NONE",
+                    "orderType": "MARKET",
+                    "session": "NORMAL",
+                    "duration": "DAY",
+                    "orderStrategyType": "SINGLE",
+                    "orderLegCollection": [
+                        {
+                            "instruction": "BUY_TO_OPEN",
+                            "quantity": quantity,
+                            "instrument": {
+                                "symbol": symbol,
+                                "assetType": "OPTION"
+                            }
+                        }
+                    ]
+                }
+            }
+            console.log(orderObject);
+            //Place Order
+            //TODO NEED TO AUTO GET ACCOUNT ID
+            var placeorder_req = {
+                url: 'https://api.tdameritrade.com/v1/accounts/492426227/orders',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer 5AuRXr8LmR0DjB7cs0fmv+GzCKb3s4Qa50tFUthZw8AO72GfQBLn1Lnh4MfaP7dx+w0xI59uyGi3d2rsbp7jqstUaXPvpmu9cQOx4UE8xt7Kgje53Zd1fSaZW95DbryzMB4PA4i2zmSZ40Z41NtHDqJ0k0qoLEbXwCM87Ge8DWq1kvOUTJXRMSOzZfeOVKD3t7ejulbm/LhL2mpwg9h2YnshwjUvG5oVXc+xfeIF6N0l2gEZ1AW/gCjkmaIYP6wsc0H9WVOpQiRBCWF8cSd2U5lXJfSTmtbZI8Cuho2Q5KFOuJe5QuJFGL5QYAAAMCwux4DRG8YrpXj6L2tMcQoTsZGT3+Bto+nzNIAHVMYByuYCaAJZPx2TtRHLY1i9wdEH0RdF9RKbs5qgl8X6S9PHzkU/dY93k0GqX2PBEAqTadimNxQyZUpO90ukEtTUdaXpSqMR+PAJXwG0JZXsu+HAgxXiEqRhD2rm4mxvpfljlukkfob6uM0VQBMOClfxnBBM41L+q+sRhE9EwtzshsRmskCKa9h10SLDugl0eABmDzWJ0iqS6100MQuG4LYrgoVi/JHHvl9e3BZ1RDopPCvydiul4DjYmqcsBGLhuvdrmlqo59Vium+2AyKt/Vt/F5igu9nhPkJlNaR04o0ZYWHBp9tVGUuH81aRjd4IotrtFOsBUjEKLGwr67VchZUU7wgAJvmSs+KesMBh353AsyQ2sDP44Ux7tG0aTypKOVIBQy3kHdO5Qm01/lE6nTrF5eqIJjuzOUVfElNJkLdkCmbGDVV3zWn7T5MWrc9Yb7YlPr2wzdJWNGDz7mHHfstjrYwPss9SwnJETujb+bUoLUeEJYB/HWKrU7KXElFtr0qov5rtLXRf3k+cju1OeSKotxUfR9nuaN4IrTqI4pjg7kAFwBUSvrt3S/OyAPIGvegjSBROxCVmmq/pdam+9S7+F33LtFV+hUcGlvgfHf4hmyPVONsEiXY5+mV6JpX4MZ2060ZCHv1WRx3MdS15JTm7A0Dbx51TiriGNLzf9GQWFAy6RHL1HdP8GuDo7hcKDCeN14lZGEma0bfa4HM+73L31Yf8jdBRi2p/UmGzavsZvodjXr5pG6mAvhMPrZgCf7SwyXLDl0BYzZkaqA==212FD3x19z9sWBHDJACbC00B75E'
+                },
+                json: true,
+                body: orderObject
+            };
+            request(placeorder_req, function (error, response, body) {
+                console.log(body);
+            });
+        }
     }
 })
 
