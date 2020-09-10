@@ -43,7 +43,7 @@ client.on('message', function (message) {
             var split = message.content.split(' ');
             var type = split[0];
             var side = split[1];
-            var quantity = split[2];
+            var quantity = split[2].replace('+','').replace('-', '');
             var symbol = split[3];
             var price = 0;
             var month = 0;
