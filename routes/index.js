@@ -147,10 +147,10 @@ client.on('message', function (message) {
             //Place Order
             //TODO NEED TO AUTO GET ACCOUNT ID
             var placeorder_req = {
-                url: 'https://api.tdameritrade.com/v1/accounts/492426227/orders',
+                url: 'https://api.tdameritrade.com/v1/accounts/accountID/orders',
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer XcWAgXL62ll7AXO75zBy4g69XxS0yd3TgfCjJCUpO5LpHUDJrejgoe+FhQy8hpx6oJ9kmhpMSeSqdegng7ytp4W942Gxu3lMGh6AlhL7vTGx5DRmSMkB3LRryLt3pnktc7PbOtkhBy1P5QbPMealF2yHoJ3g9EN6XiGRsE3fH4Wi6+pA06D/bE1VLKr6WcljhIojD4ZDsB7nTjSyh70OnDPiFwPa8GkyzAVcFoxWk0pL29vc5Ubv0BvoUnFO6IpTpnupSws1xnetgjzEZUjelOlhSkEHCdy1cD/4+U3jt0mw/bbV6JstXizjO26DQxHhoDpIcTH1ib9VaArGBuyEIBeRE+iROojNwQIQR4gSKjOLoWpLFLTy7wU6/i3oio4JwmfTCUpMH6+yENEzzsz7jg8gXJmH6SSEGhDT1If1BUZ2WqicD2xrFNNMthsZN20XdyRBqztqMdAPqBWT39a+mkes3p9JKOS5nezkSO8uq2hNWcHjczSGbmthrInSvUGVOPbu/TY2ZFq2KOO50Rfe0BNnl8GgUgtTsR9ZWwYNevZU/mQFi100MQuG4LYrgoVi/JHHvl56xnMGjhIf1rUbUJU14uxes7h+P15uy5kXXnlmdRPOuo2WHpzg8S6OrjpbtLk/aEORSVMTpynRKt9QK/qUQ5hBtAf4nFl9LkR+bistDErCTluxr0gWBacKM7J50JqgPlhbaehPSHFX3nur4foGcXNAlWxRZX+1Qa0U4gKFU0YkAxTwfvQ8XkrxKSen0ILXHZCkInTwmWI20zGU+RQx9Yr2EwZAaeIWArrMsKCRx+X3MR/LNUa2knDVC0363Ua3Q4ORAg8kppLvyo0tsleoyejAeNxPXfrlLzbAtmgIN1PQ2QSgjZ11ZdzbMuXunc5KQMrbB3Q5SGvvlCDdaICi++NbPRXfwB9xb72RuFFG2VEHJwXzzV0w8P0hy56oKEQGN+ZH1pWNq5EeSbP16O7PPUg8BiZJFNspHGeT+sYt8qqy81iRU0SItL7pIRBbiA6qRWqnSZnc6Y38NEiAGvXgXeuR5gBTZ+Ds5TivrY4OCPW2pxESLWRlhXxgTke8cHP635fCouOQrCYL72UlXxMi2y08Cqm7K6/yQxNXoHnRDSL9k8s1Ug==212FD3x19z9sWBHDJACbC00B75E'
+                    'Authorization': 'Bearer token here...'
                 },
                 json: true,
                 body: orderObject
