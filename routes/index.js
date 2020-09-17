@@ -184,26 +184,7 @@ client.on('message', function (message) {
                     });
 
                 }
-<<<<<<< HEAD
             });
-=======
-            }
-            console.log(orderObject);
-            //Place Order
-            //TODO NEED TO AUTO GET ACCOUNT ID
-            var placeorder_req = {
-                url: 'https://api.tdameritrade.com/v1/accounts/accountID/orders',
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer token here...'
-                },
-                json: true,
-                body: orderObject
-            };
-            /*request(placeorder_req, function (error, response, body) {
-                console.log(body);
-            });*/
->>>>>>> 609eb0dcac0985603fff004f9a5197929a32f393
         }
     }
 })
