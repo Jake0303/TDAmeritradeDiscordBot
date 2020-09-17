@@ -16,6 +16,7 @@ block content
                 td= user.key
                 td= user.serverID
                 td= user.channelID
+                td= user.discordTradeUserID
                 if (!user.authStatus || user.authStatus == "Authorized")
                     td(style="color:green") Authorized
                 else
