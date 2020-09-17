@@ -12,7 +12,6 @@ const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
 var passport = require('passport');
 var bcrypt = require('bcryptjs');
-var moment = require('moment');
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
