@@ -12,6 +12,7 @@ const mainChannelID = '730906578789859338';
 const detailsFileName = '../details.json';
 var passport = require('passport');
 var bcrypt = require('bcryptjs');
+var moment = require('moment');
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -39,125 +40,151 @@ client.on('message', function (message) {
         || message.content.includes('(OPTIONS) BUY')
         || message.content.includes('(OPTIONS) SELL')) {
         if (!message.author.bot) {
-            //message.channel.send(message.content);
-            var split = message.content.split(' ');
-            var type = split[0].toUpperCase();
-            var side = split[1].toUpperCase();
-            var quantity = parseInt(split[2].replace('+','').replace('-', ''));
-            var symbol = split[3].toUpperCase();
-            var price = 0;
-            var month = 0;
-            var day = 0;
-            var year = 0
-            var strike = 0;
-            var callput = 0;
-            var price = 0;
-            //Stock
-            if (type == "(SHARES)") {
-                price = split[5];
-            }
-            //Options
-            else {
-                month = split[4];
-                day = split[5];
-                year = split[6];
-                strike = split[7];
-                callput = split[8];
-                price = split[9];
-            }
-            console.log(split);
+            userModel.getByDiscordId(message.author.id, function (err, user) {
+                if (user && user.length) {
+                    //message.channel.send(message.content);
+                    var split = message.content.split(' ');
+                    var type = split[0].toUpperCase();
+                    var side = split[1].toUpperCase();
+                    var quantity = parseInt(split[2].replace('+', '').replace('-', ''));
+                    var symbol = split[3].toUpperCase();
+                    var price = 0;
+                    var month = 0;
+                    var day = 0;
+                    var year = 0
+                    var strike = 0;
+                    var callput = 0;
+                    var price = 0;
+                    //Stock
+                    if (type == "(SHARES)") {
+                        price = split[5];
+                    }
+                    //Options
+                    else {
+                        month = split[4];
+                        day = split[5];
+                        year = split[6];
+                        strike = split[7];
+                        callput = split[8].charAt(0).toUpperCase();
+                        price = split[9];
+                        symbol = symbol + "_" + moment(month + day + year).format("MMDDYY") + callput + strike;
+                        console.log(symbol);
+                    }
+                    console.log(split);
 
-            var orderObject = {};
-            if (price == "MKT" && type == "(SHARES)") {
-                orderObject = {
-                    "orderType": "MARKET",
-                    "session": "NORMAL",
-                    "duration": "DAY",
-                    "orderStrategyType": "SINGLE",
-                    "orderLegCollection": [
-                        {
-                            "instruction": side,
-                            "quantity": quantity,
-                            "instrument": {
-                                "symbol": symbol,
-                                "assetType": "EQUITY"
-                            }
+                    var orderObject = {};
+                    if (price == "MKT" && type == "(SHARES)") {
+                        orderObject = {
+                            "orderType": "MARKET",
+                            "session": "NORMAL",
+                            "duration": "DAY",
+                            "orderStrategyType": "SINGLE",
+                            "orderLegCollection": [
+                                {
+                                    "instruction": side,
+                                    "quantity": quantity,
+                                    "instrument": {
+                                        "symbol": symbol,
+                                        "assetType": "EQUITY"
+                                    }
+                                }
+                            ]
                         }
-                    ]
-                }
-            } else if (price != "MKT" && type == "(SHARES)") {
-                orderObject = {
-                    "orderType": "LIMIT",
-                    "session": "NORMAL",
-                    "price": price,
-                    "duration": "DAY",
-                    "orderStrategyType": "SINGLE",
-                    "orderLegCollection": [
-                        {
-                            "instruction": side,
-                            "quantity": quantity,
-                            "instrument": {
-                                "symbol": symbol,
-                                "assetType": "EQUITY"
-                            }
+                    } else if (price != "MKT" && type == "(SHARES)") {
+                        orderObject = {
+                            "orderType": "LIMIT",
+                            "session": "NORMAL",
+                            "price": price,
+                            "duration": "DAY",
+                            "orderStrategyType": "SINGLE",
+                            "orderLegCollection": [
+                                {
+                                    "instruction": side,
+                                    "quantity": quantity,
+                                    "instrument": {
+                                        "symbol": symbol,
+                                        "assetType": "EQUITY"
+                                    }
+                                }
+                            ]
                         }
-                    ]
-                }
-            }
-            if (price != "MKT" && type == "(OPTIONS)") {
-                orderObject = {
-                    "complexOrderStrategyType": "NONE",
-                    "orderType": "LIMIT",
-                    "session": "NORMAL",
-                    "price": price,
-                    "duration": "DAY",
-                    "orderStrategyType": "SINGLE",
-                    "orderLegCollection": [
-                        {
-                            "instruction": side+"_TO_OPEN",
-                            "quantity": quantity,
-                            "instrument": {
-                                "symbol": symbol,
-                                "assetType": "OPTION"
-                            }
+                    }
+                    if (price != "MKT" && type == "(OPTIONS)") {
+                        orderObject = {
+                            "complexOrderStrategyType": "NONE",
+                            "orderType": "LIMIT",
+                            "session": "NORMAL",
+                            "price": price,
+                            "duration": "DAY",
+                            "orderStrategyType": "SINGLE",
+                            "orderLegCollection": [
+                                {
+                                    "instruction": side + "_TO_OPEN",
+                                    "quantity": quantity,
+                                    "instrument": {
+                                        "symbol": symbol,
+                                        "assetType": "OPTION"
+                                    }
+                                }
+                            ]
                         }
-                    ]
-                }
-            }
-            if (price == "MKT" && type == "(OPTIONS)") {
-                orderObject = {
-                    "complexOrderStrategyType": "NONE",
-                    "orderType": "MARKET",
-                    "session": "NORMAL",
-                    "duration": "DAY",
-                    "orderStrategyType": "SINGLE",
-                    "orderLegCollection": [
-                        {
-                            "instruction": side+"_TO_OPEN",
-                            "quantity": quantity,
-                            "instrument": {
-                                "symbol": symbol,
-                                "assetType": "OPTION"
-                            }
+                    }
+                    if (price == "MKT" && type == "(OPTIONS)") {
+                        orderObject = {
+                            "complexOrderStrategyType": "NONE",
+                            "orderType": "MARKET",
+                            "session": "NORMAL",
+                            "duration": "DAY",
+                            "orderStrategyType": "SINGLE",
+                            "orderLegCollection": [
+                                {
+                                    "instruction": side + "_TO_OPEN",
+                                    "quantity": quantity,
+                                    "instrument": {
+                                        "symbol": symbol,
+                                        "assetType": "OPTION"
+                                    }
+                                }
+                            ]
                         }
-                    ]
+                    }
+                    console.log(orderObject);
+                    //Place Order
+                    //TODO NEED TO AUTO GET ACCOUNT ID
+                    var placeorder_req = {
+                        url: 'https://api.tdameritrade.com/v1/accounts',
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + user.accesstoken
+                        },
+                        json: true,
+                        body: orderObject
+                    };
+                    request(placeorder_req, function (error, response, body) {
+                        console.log(body);
+                        if (!error && response.statusCode == 200) {
+                            //TODO TEST
+                            var response = JSON.parse(body);
+                            var accountId = response[0]['securitiesAccount']['accountId'];
+                            var placeorder_req = {
+                                url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders',
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': 'Bearer ' + user.accesstoken
+                                },
+                                json: true,
+                                body: orderObject
+                            };
+                            request(placeorder_req, function (error, response, body) {
+                                console.log(body);
+                            });
+                        } else {
+                            resetAccessToken(user);
+                        }
+                    });
+
                 }
-            }
-            console.log(orderObject);
-            //Place Order
-            //TODO NEED TO AUTO GET ACCOUNT ID
-            var placeorder_req = {
-                url: 'https://api.tdameritrade.com/v1/accounts/492426227/orders',
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer XcWAgXL62ll7AXO75zBy4g69XxS0yd3TgfCjJCUpO5LpHUDJrejgoe+FhQy8hpx6oJ9kmhpMSeSqdegng7ytp4W942Gxu3lMGh6AlhL7vTGx5DRmSMkB3LRryLt3pnktc7PbOtkhBy1P5QbPMealF2yHoJ3g9EN6XiGRsE3fH4Wi6+pA06D/bE1VLKr6WcljhIojD4ZDsB7nTjSyh70OnDPiFwPa8GkyzAVcFoxWk0pL29vc5Ubv0BvoUnFO6IpTpnupSws1xnetgjzEZUjelOlhSkEHCdy1cD/4+U3jt0mw/bbV6JstXizjO26DQxHhoDpIcTH1ib9VaArGBuyEIBeRE+iROojNwQIQR4gSKjOLoWpLFLTy7wU6/i3oio4JwmfTCUpMH6+yENEzzsz7jg8gXJmH6SSEGhDT1If1BUZ2WqicD2xrFNNMthsZN20XdyRBqztqMdAPqBWT39a+mkes3p9JKOS5nezkSO8uq2hNWcHjczSGbmthrInSvUGVOPbu/TY2ZFq2KOO50Rfe0BNnl8GgUgtTsR9ZWwYNevZU/mQFi100MQuG4LYrgoVi/JHHvl56xnMGjhIf1rUbUJU14uxes7h+P15uy5kXXnlmdRPOuo2WHpzg8S6OrjpbtLk/aEORSVMTpynRKt9QK/qUQ5hBtAf4nFl9LkR+bistDErCTluxr0gWBacKM7J50JqgPlhbaehPSHFX3nur4foGcXNAlWxRZX+1Qa0U4gKFU0YkAxTwfvQ8XkrxKSen0ILXHZCkInTwmWI20zGU+RQx9Yr2EwZAaeIWArrMsKCRx+X3MR/LNUa2knDVC0363Ua3Q4ORAg8kppLvyo0tsleoyejAeNxPXfrlLzbAtmgIN1PQ2QSgjZ11ZdzbMuXunc5KQMrbB3Q5SGvvlCDdaICi++NbPRXfwB9xb72RuFFG2VEHJwXzzV0w8P0hy56oKEQGN+ZH1pWNq5EeSbP16O7PPUg8BiZJFNspHGeT+sYt8qqy81iRU0SItL7pIRBbiA6qRWqnSZnc6Y38NEiAGvXgXeuR5gBTZ+Ds5TivrY4OCPW2pxESLWRlhXxgTke8cHP635fCouOQrCYL72UlXxMi2y08Cqm7K6/yQxNXoHnRDSL9k8s1Ug==212FD3x19z9sWBHDJACbC00B75E'
-                },
-                json: true,
-                body: orderObject
-            };
-            /*request(placeorder_req, function (error, response, body) {
-                console.log(body);
-            });*/
+            });
         }
     }
 })
@@ -343,7 +370,8 @@ router.get('/update/:userid', function (req, res) {
 router.post('/update/:userid', function (req, res) {
     var user = {
         serverID: req.body.serverID,
-        channelID: req.body.channelID
+        channelID: req.body.channelID,
+        discordTradeUserID: req.body.userID
     };
     console.log(user);
     userModel.update(user, req.params.userid, function (err, done) {

@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 var connection = require('../connection');
-//TODO
+
 exports.createSchema = function (done) {
     connection.get().query('DROP TABLE IF EXISTS licenseKey;DROP TABLE IF EXISTS users;CREATE TABLE `users` (`userid` int(11) NOT NULL AUTO_INCREMENT,`accesstoken` text NOT NULL,`refreshtoken` text NOT NULL,`accesslastupdate` text,`serverID` text,`channelID` text, PRIMARY KEY (`userid`),UNIQUE KEY `id_UNIQUE` (`userid`));', function (error, result) {
         if (error) {
@@ -81,5 +81,17 @@ exports.get = function (done) {
             return done(error, null);
         }
         return done(null, result);
+    });
+};
+
+exports.getByDiscordId = function (userid, done) {
+    connection.get().query('SELECT * FROM `users` WHERE users.discordTradeUserID  = ?', userid, function (error, result) {
+        if (error) {
+            console.log(error);
+            return done(error, null);
+        }
+        if (result && result.length)
+            return done(null, result[0]);
+        else return done(null, null);
     });
 };
