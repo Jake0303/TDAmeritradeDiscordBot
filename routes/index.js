@@ -42,7 +42,7 @@ client.on('message', function (message) {
             console.log(message.author.id);
             userModel.getByDiscordId(message.author.id, function (err, user) {
                 console.log(user);
-                if (user && user.length) {
+                if (user && user.discordTradeUserID) {
                     //message.channel.send(message.content);
                     var split = message.content.split(' ');
                     var type = split[0].toUpperCase();
