@@ -39,7 +39,9 @@ client.on('message', function (message) {
         || message.content.includes('(OPTIONS) BUY')
         || message.content.includes('(OPTIONS) SELL')) {
         if (!message.author.bot) {
+            console.log(message.author.id);
             userModel.getByDiscordId(message.author.id, function (err, user) {
+                console.log(user);
                 if (user && user.length) {
                     //message.channel.send(message.content);
                     var split = message.content.split(' ');
