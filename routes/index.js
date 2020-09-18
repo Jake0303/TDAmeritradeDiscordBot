@@ -32,7 +32,7 @@ client.on('message', function (message) {
         message.channel.send("Bot message format for Stocks : (SHARES) BUY/SELL +QUANTITY/-QUANTITY SYMBOL @ PRICE/MKT");
         message.channel.send("Stocks Example : (SHARES) BUY +1 GT @ 9.55");
         message.channel.send("Bot message format for Options : (OPTIONS) BUY/SELL +QUANTITY/-QUANTITY SYMBOL MONTH DAY YEAR STRIKE Call/Put @ PRICE/MKT");
-        message.channel.send("Stocks Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 Call @ 0.02");
+        message.channel.send("Options Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 Call @ 0.02");
     }
     if (message.content.includes('(SHARES) BUY')
         || message.content.includes('(SHARES) SELL')
