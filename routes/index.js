@@ -156,9 +156,9 @@ client.on('message', function (message) {
                         url: 'https://api.tdameritrade.com/v1/accounts',
                         method: 'GET',
                         headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
                             'Authorization': 'Bearer ' + user.accesstoken
-                        },
-                        body: orderObject
+                        }
                     };
                     request(placeorder_req, function (error, response, body) {
                         console.log(body);
@@ -171,6 +171,7 @@ client.on('message', function (message) {
                                 url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders',
                                 method: 'POST',
                                 headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
                                     'Authorization': 'Bearer ' + user.accesstoken
                                 },
                                 json: true,
