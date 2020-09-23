@@ -65,10 +65,11 @@ client.on('message', function (message) {
                         month = split[4];
                         day = split[5];
                         year = split[6];
-                        strike = split[7];
+                        strike = parseInt(split[7]);
                         callput = split[8].charAt(0).toUpperCase();
                         price = split[10];
                         symbol = symbol + "_" + moment(month + day + year).format("MMDDYY") + callput + strike;
+                        console.log(symbol);
                     }
 
                     var orderObject = {};
@@ -168,7 +169,6 @@ client.on('message', function (message) {
                                 url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders',
                                 method: 'POST',
                                 headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
                                     'Authorization': 'Bearer ' + user.accesstoken
                                 },
                                 body: orderObject
