@@ -158,15 +158,15 @@ client.on('message', function (message) {
                         headers: {
                             'Authorization': 'Bearer ' + user.accesstoken
                         },
-                        json: true,
                         body: orderObject
                     };
                     request(placeorder_req, function (error, response, body) {
                         console.log(body);
                         if (!error && response.statusCode == 200) {
+                            console.log(JSON.parse(body));
+                            body = JSON.parse(body);
                             //TODO TEST
-                            var response = JSON.parse(body);
-                            var accountId = response[0]['securitiesAccount']['accountId'];
+                            var accountId = body[0]['securitiesAccount']['accountId'];
                             var placeorder_req = {
                                 url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders',
                                 method: 'POST',
