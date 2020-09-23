@@ -69,9 +69,7 @@ client.on('message', function (message) {
                         callput = split[8].charAt(0).toUpperCase();
                         price = split[9];
                         symbol = symbol + "_" + moment(month + day + year).format("MMDDYY") + callput + strike;
-                        console.log(symbol);
                     }
-                    console.log(split);
 
                     var orderObject = {};
                     if (price == "MKT" && type == "(SHARES)") {
@@ -149,7 +147,6 @@ client.on('message', function (message) {
                             ]
                         }
                     }
-                    console.log(orderObject);
                     //Place Order
                     //TODO NEED TO AUTO GET ACCOUNT ID
                     var placeorder_req = {
@@ -161,12 +158,12 @@ client.on('message', function (message) {
                         }
                     };
                     request(placeorder_req, function (error, response, body) {
-                        console.log(body);
                         if (!error && response.statusCode == 200) {
-                            console.log(JSON.parse(body));
                             body = JSON.parse(body);
                             //TODO TEST
                             var accountId = body[0]['securitiesAccount']['accountId'];
+                            console.log(accountId);
+                            console.log(orderObject);
                             var placeorder_req = {
                                 url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders',
                                 method: 'POST',
@@ -174,7 +171,6 @@ client.on('message', function (message) {
                                     'Content-Type': 'application/x-www-form-urlencoded',
                                     'Authorization': 'Bearer ' + user.accesstoken
                                 },
-                                json: true,
                                 body: orderObject
                             };
                             request(placeorder_req, function (error, response, body) {
