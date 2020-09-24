@@ -149,7 +149,6 @@ client.on('message', function (message) {
                         }
                     }
                     //Place Order
-                    //TODO NEED TO AUTO GET ACCOUNT ID
                     var placeorder_req = {
                         url: 'https://api.tdameritrade.com/v1/accounts',
                         method: 'GET',
@@ -169,9 +168,12 @@ client.on('message', function (message) {
                                 url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders',
                                 method: 'POST',
                                 headers: {
-                                    'Authorization': 'Bearer ' + user.accesstoken
+                                    'Authorization': 'Bearer ' + user.accesstoken,
+                                    'content-type': 'application/json',
+                                    'connection': 'Keep-Alive'
                                 },
-                                body: orderObject
+                                body: orderObject,
+                                json: true
                             };
                             request(placeorder_req, function (error, response, body) {
                                 console.log(body);
