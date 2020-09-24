@@ -68,7 +68,7 @@ client.on('message', function (message) {
                         strike = parseInt(split[7]);
                         callput = split[8].charAt(0).toUpperCase();
                         price = split[10];
-                        symbol = symbol + "_" + moment(month + day + year).format("MMMDDYY") + callput + strike;
+                        symbol = symbol + "_" + moment(month + ' ' + day + ' ' + year).format("MMMDDYY") + callput + strike;
                         console.log(month + day + year);
                         console.log(symbol);
                     }
