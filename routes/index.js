@@ -69,7 +69,7 @@ tradingclient.on('message', function (message) {
                         var accountId = body[0]['securitiesAccount']['accountId'];
                         //Get last order
                         var placeorder_req = {
-                            url: 'https://api.tdameritrade.com/v1/orders?accountId='+accountId+'&maxResults=1',
+                            url: 'https://api.tdameritrade.com/v1/orders?accountId='+accountId+'&maxResults=1&status=WORKING',
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
