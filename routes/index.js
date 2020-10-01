@@ -47,15 +47,66 @@ tradingclient.on('message', function (message) {
         message.channel.send("Stocks Example : (SHARES) BUY +1 GT @ 9.55");
         message.channel.send("Bot message format for Options : (OPTIONS) BUY/SELL +QUANTITY/-QUANTITY SYMBOL MONTH DAY YEAR STRIKE Call/Put @ PRICE/MKT");
         message.channel.send("Options Example : (OPTIONS) BUY +1 SPY AUG 24 2020 346.0 Call @ 0.02");
+        message.channel.send("To cancel last order : !clo");
     }
+    //Cancel Order
+    if (message.content.includes('!clo')) {
+        if (!message.author.bot) {
+            userModel.getByDiscordId(message.author.id, function (err, user) {
+                //Get Account ID
+                var placeorder_req = {
+                    url: 'https://api.tdameritrade.com/v1/accounts',
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Bearer ' + user.accesstoken
+                    }
+                };
+                //Get Account ID
+                request(placeorder_req, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        body = JSON.parse(body);
+                        var accountId = body[0]['securitiesAccount']['accountId'];
+                        //Get last order
+                        var placeorder_req = {
+                            url: 'https://api.tdameritrade.com/v1/orders?accountId='+accountId+'&maxResults=1',
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Authorization': 'Bearer ' + user.accesstoken
+                            }
+                        };
+                        request(placeorder_req, function (error, response, body) {
+                            body = JSON.parse(body);
+                            console.log(body);
+                            //Cancel order
+                            //Get last order
+                            var placeorder_req = {
+                                url: 'https://api.tdameritrade.com/v1/accounts/' + accountId +'/orders/'+body[0].orderId,
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'Authorization': 'Bearer ' + user.accesstoken
+                                }
+                            };
+                            request(placeorder_req, function (error, response, body) {
+                                body = JSON.parse(body);
+                                console.log(body);
+
+                            });
+                        });
+                    }
+                });
+            })
+        }
+    }
+    //Submit order
     if (message.content.includes('(SHARES) BUY')
         || message.content.includes('(SHARES) SELL')
         || message.content.includes('(OPTIONS) BUY')
         || message.content.includes('(OPTIONS) SELL')) {
         if (!message.author.bot) {
-            console.log(message.author.id);
             userModel.getByDiscordId(message.author.id, function (err, user) {
-                console.log(user);
                 if (user && user.discordTradeUserID) {
                     //message.channel.send(message.content);
                     var split = message.content.split(' ');
