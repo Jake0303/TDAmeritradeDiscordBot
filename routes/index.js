@@ -90,9 +90,7 @@ tradingclient.on('message', function (message) {
                                 }
                             };
                             request(placeorder_req, function (error, response, body) {
-                                body = JSON.parse(body);
                                 console.log(body);
-
                             });
                         });
                     }
