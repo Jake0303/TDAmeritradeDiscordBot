@@ -14,6 +14,7 @@ var passport = require('passport');
 var bcrypt = require('bcryptjs');
 require('dotenv').config();
 const Discord = require('discord.js');
+//Signals Bot
 const client = new Discord.Client();
 var async = require('async');
 //On Discord Error
@@ -26,8 +27,21 @@ client.on('ready', () => {
     exports.client = client;
 });
 client.login(process.env.DISCORDTOKEN);
+//Trading Client
+const tradingclient = new Discord.Client();
+//On Discord Error
+tradingclient.on('error', err => {
+    console.log(err);
+});
+exports.tradingclient = tradingclient;
+//Kick cancelled students
+tradingclient.on('ready', () => {
+    exports.tradingclient = tradingclient;
+});
+tradingclient.login(process.env.DISCORDTRADINGTOKEN);
+//Trading Bot
 //Relay messages from Discord and post to them a forum ticker automatically if it contains ($)
-client.on('message', function (message) {
+tradingclient.on('message', function (message) {
     if (message.content === 'bothelp') {
         message.channel.send("Bot message format for Stocks : (SHARES) BUY/SELL +QUANTITY/-QUANTITY SYMBOL @ PRICE/MKT");
         message.channel.send("Stocks Example : (SHARES) BUY +1 GT @ 9.55");
@@ -161,7 +175,6 @@ client.on('message', function (message) {
                     request(placeorder_req, function (error, response, body) {
                         if (!error && response.statusCode == 200) {
                             body = JSON.parse(body);
-                            //TODO TEST
                             var accountId = body[0]['securitiesAccount']['accountId'];
                             console.log(accountId);
                             console.log(orderObject);
