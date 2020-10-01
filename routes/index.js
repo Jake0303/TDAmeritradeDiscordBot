@@ -69,7 +69,7 @@ tradingclient.on('message', function (message) {
                         var accountId = body[0]['securitiesAccount']['accountId'];
                         //Get last order
                         var placeorder_req = {
-                            url: 'https://api.tdameritrade.com/v1/orders?accountId='+accountId+'&maxResults=1&status=WORKING',
+                            url: 'https://api.tdameritrade.com/v1/orders?accountId='+accountId+'',
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -78,20 +78,23 @@ tradingclient.on('message', function (message) {
                         };
                         request(placeorder_req, function (error, response, body) {
                             body = JSON.parse(body);
-                            console.log(body);
                             //Cancel order
                             //Get last order
-                            var placeorder_req = {
-                                url: 'https://api.tdameritrade.com/v1/accounts/' + accountId +'/orders/'+body[0].orderId,
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                    'Authorization': 'Bearer ' + user.accesstoken
-                                }
-                            };
-                            request(placeorder_req, function (error, response, body) {
-                                console.log(body);
-                            });
+                            for (var b in body) {
+                                console.log(b);
+                                console.log(body[b]);
+                                var placeorder_req = {
+                                    url: 'https://api.tdameritrade.com/v1/accounts/' + accountId + '/orders/' + body[b].orderId,
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'Authorization': 'Bearer ' + user.accesstoken
+                                    }
+                                };
+                                request(placeorder_req, function (error, response, body) {
+                                    console.log(body);
+                                });
+                            }
                         });
                     }
                 });
