@@ -28,7 +28,7 @@
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "pug": "^2.0.0-beta6",
+    "pug": "^3.0.1",
     "puppeteer": "^1.7.0",
     "request": "^2.88.2",
     "serve-favicon": "^2.3.0"
